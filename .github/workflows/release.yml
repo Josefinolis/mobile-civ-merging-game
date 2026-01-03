@@ -31,10 +31,29 @@ jobs:
         with:
           lfs: true
 
-      - name: Setup
+      - name: Setup export templates
         run: |
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Generate debug keystore
+        run: |
+          mkdir -p ~/.android
+          keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" -noprompt
+
+      - name: Configure Godot editor settings
+        run: |
+          mkdir -p ~/.config/godot
+          cat > ~/.config/godot/editor_settings-4.tres << 'EDITOR_EOF'
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
+          export/android/android_sdk_path = "/usr/lib/android-sdk"
+          export/android/debug_keystore = "/github/home/.android/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          EDITOR_EOF
 
       - name: Create export presets
         run: |
@@ -240,6 +259,12 @@ jobs:
           permissions/write_social_stream=false
           permissions/write_sync_settings=false
           permissions/write_user_dictionary=false
+          keystore/debug="/github/home/.android/debug.keystore"
+          keystore/debug_user="androiddebugkey"
+          keystore/debug_password="android"
+          keystore/release=""
+          keystore/release_user=""
+          keystore/release_password=""
           EOF
 
       - name: Create builds directory
@@ -248,20 +273,11 @@ jobs:
       - name: Android Debug Build
         run: godot --headless --verbose --export-debug "Android" builds/android/${EXPORT_NAME}-debug.apk
 
-      - name: Android Release Build
-        run: godot --headless --verbose --export-release "Android" builds/android/${EXPORT_NAME}-release.apk
-
       - name: Upload Debug APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-debug
           path: builds/android/${{ env.EXPORT_NAME }}-debug.apk
-
-      - name: Upload Release APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-release
-          path: builds/android/${{ env.EXPORT_NAME }}-release.apk
 
   release:
     name: Create Release
@@ -276,12 +292,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: android-debug
-          path: builds/
-
-      - name: Download Release APK
-        uses: actions/download-artifact@v4
-        with:
-          name: android-release
           path: builds/
 
       - name: Get version name
@@ -302,13 +312,11 @@ jobs:
           prerelease: false
           files: |
             builds/merge-town-debug.apk
-            builds/merge-town-release.apk
           body: |
             ## Merge Town - ${{ steps.version.outputs.VERSION }}
 
             ### Download
-            - **merge-town-debug.apk**: Debug build (for testing)
-            - **merge-town-release.apk**: Release build (optimized)
+            - **merge-town-debug.apk**: Debug build for testing
 
             ### Installation
             1. Download the APK on your Android device
