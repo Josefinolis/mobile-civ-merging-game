@@ -1,0 +1,149 @@
+[gd_scene load_steps=3 format=3 uid="uid://main001"]
+
+[ext_resource type="Script" path="res://scripts/ui_manager.gd" id="1_ui"]
+[ext_resource type="Script" path="res://scripts/game_grid.gd" id="2_grid"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ui")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.15, 0.2, 0.15, 1)
+
+[node name="TopBar" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+grow_horizontal = 2
+
+[node name="HBox" type="HBoxContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="CoinsContainer" type="VBoxContainer" parent="TopBar/HBox"]
+layout_mode = 2
+
+[node name="CoinsTitle" type="Label" parent="TopBar/HBox/CoinsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+theme_override_font_sizes/font_size = 14
+text = "COINS"
+horizontal_alignment = 1
+
+[node name="CoinsLabel" type="Label" parent="TopBar/HBox/CoinsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "0"
+horizontal_alignment = 1
+
+[node name="EnergyContainer" type="VBoxContainer" parent="TopBar/HBox"]
+layout_mode = 2
+
+[node name="EnergyTitle" type="Label" parent="TopBar/HBox/EnergyContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "ENERGY"
+horizontal_alignment = 1
+
+[node name="EnergyLabel" type="Label" parent="TopBar/HBox/EnergyContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "10/10"
+horizontal_alignment = 1
+
+[node name="IncomeContainer" type="VBoxContainer" parent="TopBar/HBox"]
+layout_mode = 2
+
+[node name="IncomeTitle" type="Label" parent="TopBar/HBox/IncomeContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "INCOME"
+horizontal_alignment = 1
+
+[node name="IncomeLabel" type="Label" parent="TopBar/HBox/IncomeContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "+0/s"
+horizontal_alignment = 1
+
+[node name="GridContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 90.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameGrid" type="Control" parent="GridContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(600, 980)
+layout_mode = 2
+script = ExtResource("2_grid")
+
+[node name="CellsContainer" type="Control" parent="GridContainer/GameGrid"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BuildingsContainer" type="Control" parent="GridContainer/GameGrid"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Highlight" type="ColorRect" parent="GridContainer/GameGrid"]
+visible = false
+layout_mode = 1
+offset_right = 120.0
+offset_bottom = 140.0
+color = Color(0, 1, 0, 0.3)
+
+[node name="BottomBar" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -90.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HBox" type="HBoxContainer" parent="BottomBar"]
+layout_mode = 2
+alignment = 1
+
+[node name="SpawnButton" type="Button" parent="BottomBar/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "BUILD NEW"

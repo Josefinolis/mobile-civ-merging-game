@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4CAF50"/>
+      <stop offset="100%" style="stop-color:#2E7D32"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="20" fill="url(#bg)"/>
+  <!-- Building 1 -->
+  <rect x="20" y="70" width="25" height="40" fill="#FFF" rx="2"/>
+  <rect x="25" y="75" width="6" height="8" fill="#4CAF50"/>
+  <rect x="34" y="75" width="6" height="8" fill="#4CAF50"/>
+  <rect x="25" y="88" width="6" height="8" fill="#4CAF50"/>
+  <rect x="34" y="88" width="6" height="8" fill="#4CAF50"/>
+  <!-- Building 2 (taller) -->
+  <rect x="50" y="45" width="28" height="65" fill="#FFF" rx="2"/>
+  <rect x="55" y="50" width="7" height="10" fill="#2196F3"/>
+  <rect x="66" y="50" width="7" height="10" fill="#2196F3"/>
+  <rect x="55" y="65" width="7" height="10" fill="#2196F3"/>
+  <rect x="66" y="65" width="7" height="10" fill="#2196F3"/>
+  <rect x="55" y="80" width="7" height="10" fill="#2196F3"/>
+  <rect x="66" y="80" width="7" height="10" fill="#2196F3"/>
+  <rect x="60" y="95" width="8" height="15" fill="#795548"/>
+  <!-- Building 3 -->
+  <rect x="83" y="60" width="25" height="50" fill="#FFF" rx="2"/>
+  <rect x="88" y="65" width="6" height="8" fill="#FF9800"/>
+  <rect x="97" y="65" width="6" height="8" fill="#FF9800"/>
+  <rect x="88" y="78" width="6" height="8" fill="#FF9800"/>
+  <rect x="97" y="78" width="6" height="8" fill="#FF9800"/>
+  <rect x="88" y="91" width="6" height="8" fill="#FF9800"/>
+  <rect x="97" y="91" width="6" height="8" fill="#FF9800"/>
+  <!-- Merge arrows -->
+  <path d="M30 30 L50 30 M45 25 L50 30 L45 35" stroke="#FFF" stroke-width="3" fill="none"/>
+  <path d="M98 30 L78 30 M83 25 L78 30 L83 35" stroke="#FFF" stroke-width="3" fill="none"/>
+  <!-- Plus sign -->
+  <circle cx="64" cy="25" r="10" fill="#FFF"/>
+  <text x="64" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#4CAF50">+</text>
+</svg>

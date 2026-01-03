@@ -1,0 +1,48 @@
+# Godot 4+ specific ignores
+.godot/
+
+# Godot-specific ignores
+*.translation
+
+# Imported textures and samples
+.import/
+
+# Android export
+android/build/
+*.apk
+*.aab
+*.keystore
+
+# iOS export
+*.ipa
+
+# Export templates
+export_presets.cfg.bak
+
+# Editor files
+*.tmp
+*.bak
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build outputs
+builds/
+export/
+
+# User-specific stuff
+*.local
