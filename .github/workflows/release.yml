@@ -270,6 +270,11 @@ jobs:
       - name: Create builds directory
         run: mkdir -p builds/android
 
+      - name: Import project resources
+        run: |
+          godot --headless --import
+          godot --headless -e --quit || true
+
       - name: Android Debug Build
         run: godot --headless --verbose --export-debug "Android" builds/android/${EXPORT_NAME}-debug.apk
 
