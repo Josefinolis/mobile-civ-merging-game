@@ -2,10 +2,10 @@ extends Control
 class_name UIManager
 ## UIManager - Handles all UI updates and user interactions
 
-@onready var coins_label: Label = $TopBar/CoinsContainer/CoinsLabel
-@onready var energy_label: Label = $TopBar/EnergyContainer/EnergyLabel
-@onready var income_label: Label = $TopBar/IncomeContainer/IncomeLabel
-@onready var spawn_button: Button = $BottomBar/SpawnButton
+@onready var coins_label: Label = $TopBar/HBox/CoinsContainer/CoinsLabel
+@onready var energy_label: Label = $TopBar/HBox/EnergyContainer/EnergyLabel
+@onready var income_label: Label = $TopBar/HBox/IncomeContainer/IncomeLabel
+@onready var spawn_button: Button = $BottomBar/HBox/SpawnButton
 @onready var game_grid: GameGrid = $GridContainer/GameGrid
 
 var _coins_display: float = 0.0
