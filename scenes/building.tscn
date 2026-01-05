@@ -3,62 +3,100 @@
 [ext_resource type="Script" path="res://scripts/building.gd" id="1_building"]
 
 [node name="Building" type="Control"]
-custom_minimum_size = Vector2(110, 130)
+custom_minimum_size = Vector2(100, 120)
 layout_mode = 3
 anchors_preset = 0
-offset_right = 110.0
-offset_bottom = 130.0
+offset_right = 100.0
+offset_bottom = 120.0
 script = ExtResource("1_building")
 
-[node name="Sprite" type="ColorRect" parent="."]
+[node name="Shadow" type="ColorRect" parent="."]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 4.0
+offset_bottom = -15.0
+color = Color(0, 0, 0, 0.3)
+
+[node name="BuildingBase" type="Control" parent="."]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -20.0
+
+[node name="MainBody" type="ColorRect" parent="BuildingBase"]
 mouse_filter = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 5.0
-offset_top = 5.0
+offset_top = 20.0
 offset_right = -5.0
-offset_bottom = -25.0
-color = Color(0.545098, 0.431373, 0.388235, 1)
+color = Color(0.545, 0.431, 0.388, 1)
 
-[node name="Roof" type="ColorRect" parent="Sprite"]
+[node name="Roof" type="ColorRect" parent="BuildingBase"]
 mouse_filter = 2
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 15.0
+offset_bottom = 25.0
 grow_horizontal = 2
 color = Color(0.4, 0.3, 0.25, 1)
 
-[node name="Window1" type="ColorRect" parent="Sprite"]
+[node name="RoofHighlight" type="ColorRect" parent="BuildingBase/Roof"]
 mouse_filter = 2
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = 8.0
+grow_horizontal = 2
+color = Color(0.5, 0.4, 0.35, 1)
+
+[node name="WindowRow" type="HBoxContainer" parent="BuildingBase"]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
 offset_left = 10.0
-offset_top = 25.0
-offset_right = 30.0
-offset_bottom = 45.0
-color = Color(0.9, 0.9, 0.6, 1)
+offset_top = 5.0
+offset_right = -10.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
 
-[node name="Window2" type="ColorRect" parent="Sprite"]
+[node name="Window1" type="ColorRect" parent="BuildingBase/WindowRow"]
 mouse_filter = 2
-layout_mode = 0
-offset_left = 40.0
-offset_top = 25.0
-offset_right = 60.0
-offset_bottom = 45.0
-color = Color(0.9, 0.9, 0.6, 1)
+custom_minimum_size = Vector2(18, 22)
+layout_mode = 2
+color = Color(0.95, 0.95, 0.7, 1)
 
-[node name="Window3" type="ColorRect" parent="Sprite"]
+[node name="Window2" type="ColorRect" parent="BuildingBase/WindowRow"]
 mouse_filter = 2
-layout_mode = 0
-offset_left = 70.0
-offset_top = 25.0
-offset_right = 90.0
-offset_bottom = 45.0
-color = Color(0.9, 0.9, 0.6, 1)
+custom_minimum_size = Vector2(18, 22)
+layout_mode = 2
+color = Color(0.95, 0.95, 0.7, 1)
 
-[node name="Door" type="ColorRect" parent="Sprite"]
+[node name="Window3" type="ColorRect" parent="BuildingBase/WindowRow"]
+mouse_filter = 2
+custom_minimum_size = Vector2(18, 22)
+layout_mode = 2
+color = Color(0.95, 0.95, 0.7, 1)
+
+[node name="Door" type="ColorRect" parent="BuildingBase"]
 mouse_filter = 2
 layout_mode = 1
 anchors_preset = 7
@@ -67,27 +105,70 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -10.0
-offset_top = -30.0
+offset_top = -28.0
 offset_right = 10.0
 grow_horizontal = 2
 grow_vertical = 0
-color = Color(0.4, 0.25, 0.15, 1)
+color = Color(0.35, 0.2, 0.12, 1)
 
-[node name="LevelLabel" type="Label" parent="."]
+[node name="DoorKnob" type="ColorRect" parent="BuildingBase/Door"]
 mouse_filter = 2
 layout_mode = 1
-anchors_preset = 1
+anchors_preset = 6
 anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = -30.0
-offset_bottom = 25.0
+anchor_bottom = 0.5
+offset_left = -6.0
+offset_top = -2.0
+offset_right = -2.0
+offset_bottom = 2.0
 grow_horizontal = 0
+grow_vertical = 2
+color = Color(0.8, 0.7, 0.2, 1)
+
+[node name="Chimney" type="ColorRect" parent="BuildingBase"]
+visible = false
+mouse_filter = 2
+layout_mode = 0
+offset_left = 70.0
+offset_top = -8.0
+offset_right = 85.0
+offset_bottom = 15.0
+color = Color(0.5, 0.35, 0.3, 1)
+
+[node name="Decoration" type="ColorRect" parent="BuildingBase"]
+visible = false
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -5.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.3, 0.5, 0.3, 1)
+
+[node name="LevelBadge" type="ColorRect" parent="."]
+mouse_filter = 2
+layout_mode = 0
+offset_right = 24.0
+offset_bottom = 24.0
+color = Color(0.2, 0.2, 0.3, 0.9)
+
+[node name="LevelLabel" type="Label" parent="LevelBadge"]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 14
 text = "1"
-horizontal_alignment = 2
+horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="NameLabel" type="Label" parent="."]
@@ -97,28 +178,25 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -20.0
+offset_top = -18.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 text = "Tent"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="CoinIndicator" type="Label" parent="."]
 mouse_filter = 2
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 2.0
-offset_bottom = 18.0
-grow_horizontal = 2
+layout_mode = 0
+offset_left = 24.0
+offset_right = 100.0
+offset_bottom = 16.0
 theme_override_colors/font_color = Color(1, 0.84, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 10
 text = "+0.1/s"
-horizontal_alignment = 1
