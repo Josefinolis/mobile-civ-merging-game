@@ -27,7 +27,7 @@ color = Color(0.15, 0.2, 0.15, 1)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 80.0
+offset_bottom = 100.0
 grow_horizontal = 2
 
 [node name="HBox" type="HBoxContainer" parent="TopBar"]
@@ -41,14 +41,14 @@ layout_mode = 2
 [node name="CoinsTitle" type="Label" parent="TopBar/HBox/CoinsContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.84, 0, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "COINS"
 horizontal_alignment = 1
 
 [node name="CoinsLabel" type="Label" parent="TopBar/HBox/CoinsContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "0"
 horizontal_alignment = 1
 
@@ -58,14 +58,14 @@ layout_mode = 2
 [node name="EnergyTitle" type="Label" parent="TopBar/HBox/EnergyContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.8, 1, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "ENERGY"
 horizontal_alignment = 1
 
 [node name="EnergyLabel" type="Label" parent="TopBar/HBox/EnergyContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "10/10"
 horizontal_alignment = 1
 
@@ -75,22 +75,22 @@ layout_mode = 2
 [node name="IncomeTitle" type="Label" parent="TopBar/HBox/IncomeContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 1, 0.4, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "INCOME"
 horizontal_alignment = 1
 
 [node name="IncomeLabel" type="Label" parent="TopBar/HBox/IncomeContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "+0/s"
 horizontal_alignment = 1
 
 [node name="SettingsButton" type="Button" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(40, 40)
+custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 28
 text = "⚙"
 flat = true
 
@@ -99,13 +99,13 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 120.0
-offset_bottom = -100.0
+offset_top = 150.0
+offset_bottom = -120.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="GameGrid" type="Control" parent="GridContainer"]
-custom_minimum_size = Vector2(600, 980)
+custom_minimum_size = Vector2(640, 850)
 layout_mode = 2
 script = ExtResource("2_grid")
 
@@ -128,8 +128,8 @@ grow_vertical = 2
 [node name="Highlight" type="ColorRect" parent="GridContainer/GameGrid"]
 visible = false
 layout_mode = 1
-offset_right = 120.0
-offset_bottom = 140.0
+offset_right = 160.0
+offset_bottom = 170.0
 color = Color(0, 1, 0, 0.3)
 
 [node name="BottomBar" type="PanelContainer" parent="."]
@@ -138,7 +138,7 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -90.0
+offset_top = -110.0
 grow_horizontal = 2
 grow_vertical = 0
 
@@ -147,48 +147,48 @@ layout_mode = 2
 alignment = 1
 
 [node name="SpawnButton" type="Button" parent="BottomBar/HBox"]
-custom_minimum_size = Vector2(200, 60)
+custom_minimum_size = Vector2(280, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "BUILD NEW"
 
 [node name="QuestPanel" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(0, 35)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 82.0
-offset_bottom = 117.0
+offset_top = 102.0
+offset_bottom = 152.0
 grow_horizontal = 2
 script = ExtResource("3_quest")
 
 [node name="MarginContainer" type="MarginContainer" parent="QuestPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 2
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 4
 
 [node name="VBox" type="VBoxContainer" parent="QuestPanel/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 4
 
 [node name="TitleBar" type="HBoxContainer" parent="QuestPanel/MarginContainer/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
 [node name="CollapseIcon" type="Label" parent="QuestPanel/MarginContainer/VBox/TitleBar"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 text = ">"
 
 [node name="TitleButton" type="Button" parent="QuestPanel/MarginContainer/VBox/TitleBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.84, 0, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 20
 flat = true
 text = "QUESTS (3)"
 alignment = 0
@@ -196,7 +196,7 @@ alignment = 0
 [node name="QuestsContainer" type="VBoxContainer" parent="QuestPanel/MarginContainer/VBox"]
 visible = false
 layout_mode = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 4
 
 [node name="SettingsOverlay" type="ColorRect" parent="."]
 visible = false
@@ -211,31 +211,31 @@ mouse_filter = 0
 
 [node name="SettingsPanel" type="PanelContainer" parent="."]
 visible = false
-custom_minimum_size = Vector2(350, 300)
+custom_minimum_size = Vector2(450, 380)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -175.0
-offset_top = -150.0
-offset_right = 175.0
-offset_bottom = 150.0
+offset_left = -225.0
+offset_top = -190.0
+offset_right = 225.0
+offset_bottom = 190.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("4_settings")
 
 [node name="MarginContainer" type="MarginContainer" parent="SettingsPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 15
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 20
 
 [node name="VBox" type="VBoxContainer" parent="SettingsPanel/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 15
+theme_override_constants/separation = 20
 
 [node name="Header" type="HBoxContainer" parent="SettingsPanel/MarginContainer/VBox"]
 layout_mode = 2
@@ -244,14 +244,14 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.84, 0, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "SETTINGS"
 
 [node name="CloseButton" type="Button" parent="SettingsPanel/MarginContainer/VBox/Header"]
-custom_minimum_size = Vector2(30, 30)
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 24
 text = "X"
 flat = true
 
@@ -260,16 +260,16 @@ layout_mode = 2
 
 [node name="MusicRow" type="HBoxContainer" parent="SettingsPanel/MarginContainer/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 15
 
 [node name="MusicLabel" type="Label" parent="SettingsPanel/MarginContainer/VBox/MusicRow"]
-custom_minimum_size = Vector2(60, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "Music"
 
 [node name="MusicSlider" type="HSlider" parent="SettingsPanel/MarginContainer/VBox/MusicRow"]
-custom_minimum_size = Vector2(150, 20)
+custom_minimum_size = Vector2(180, 30)
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 100.0
@@ -281,16 +281,16 @@ button_pressed = true
 
 [node name="SFXRow" type="HBoxContainer" parent="SettingsPanel/MarginContainer/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 15
 
 [node name="SFXLabel" type="Label" parent="SettingsPanel/MarginContainer/VBox/SFXRow"]
-custom_minimum_size = Vector2(60, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "SFX"
 
 [node name="SFXSlider" type="HSlider" parent="SettingsPanel/MarginContainer/VBox/SFXRow"]
-custom_minimum_size = Vector2(150, 20)
+custom_minimum_size = Vector2(180, 30)
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 100.0
@@ -306,6 +306,6 @@ layout_mode = 2
 [node name="VersionLabel" type="Label" parent="SettingsPanel/MarginContainer/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 16
 text = "Version 1.0.0"
 horizontal_alignment = 1

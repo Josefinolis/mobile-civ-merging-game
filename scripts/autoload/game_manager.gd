@@ -39,7 +39,7 @@ var max_building_level: int = 10
 var highest_unlocked_level: int = 1
 
 # Grid state
-var grid_size: Vector2i = Vector2i(5, 7)
+var grid_size: Vector2i = Vector2i(4, 5)
 var grid: Array = []  # 2D array of building levels (0 = empty)
 
 # Fractional coin accumulator (for smooth generation)

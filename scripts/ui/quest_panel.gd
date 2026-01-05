@@ -36,9 +36,9 @@ func _set_expanded(expanded: bool) -> void:
 	var tween = create_tween()
 	tween.set_ease(Tween.EASE_OUT)
 	if expanded:
-		tween.tween_property(self, "custom_minimum_size:y", 160, 0.2)
+		tween.tween_property(self, "custom_minimum_size:y", 200, 0.2)
 	else:
-		tween.tween_property(self, "custom_minimum_size:y", 35, 0.2)
+		tween.tween_property(self, "custom_minimum_size:y", 50, 0.2)
 
 func _refresh_quests() -> void:
 	# Update title with quest count
@@ -76,14 +76,14 @@ func _create_quest_item(quest: Dictionary) -> Control:
 		var percent = float(quest.progress) / float(quest.target) * 100
 		progress_circle.text = "[%d%%]" % percent
 		progress_circle.add_theme_color_override("font_color", Color.YELLOW)
-	progress_circle.add_theme_font_size_override("font_size", 10)
+	progress_circle.add_theme_font_size_override("font_size", 14)
 	item.add_child(progress_circle)
 
 	# Description (shortened)
 	var desc_label = Label.new()
 	desc_label.name = "Desc"
 	desc_label.text = _shorten_description(quest.description)
-	desc_label.add_theme_font_size_override("font_size", 11)
+	desc_label.add_theme_font_size_override("font_size", 16)
 	desc_label.add_theme_color_override("font_color", Color.WHITE if not quest.completed else Color.GREEN)
 	desc_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	item.add_child(desc_label)
@@ -92,7 +92,7 @@ func _create_quest_item(quest: Dictionary) -> Control:
 	var reward_label = Label.new()
 	reward_label.name = "Reward"
 	reward_label.text = "+%d" % quest.reward_coins
-	reward_label.add_theme_font_size_override("font_size", 10)
+	reward_label.add_theme_font_size_override("font_size", 14)
 	reward_label.add_theme_color_override("font_color", Color.GOLD)
 	item.add_child(reward_label)
 
