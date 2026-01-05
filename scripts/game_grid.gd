@@ -100,10 +100,13 @@ func _on_building_drag_ended(building) -> void:
 		elif target_level == 0:
 			# Move to empty cell
 			_move_building(building, target_grid_pos)
+			AudioManager.play_drop()
 		else:
 			# Can't merge, return to original position
+			AudioManager.play_error()
 			building.reset_position()
 	else:
+		AudioManager.play_drop()
 		building.reset_position()
 
 	dragged_building = null
@@ -125,6 +128,9 @@ func _perform_merge(source, target) -> void:
 
 	target.setup(new_level, target.grid_position)
 	target.animate_merge()
+
+	# Play merge sound
+	AudioManager.play_merge()
 
 	# Create particle effects
 	ParticleEffects.create_merge_particles(self, merge_position, merge_color)
@@ -191,6 +197,9 @@ func spawn_new_building() -> bool:
 					# Add spawn effect
 					var spawn_pos = building.position
 					ParticleEffects.create_spawn_effect(self, spawn_pos, building.size)
+
+		# Play spawn sound
+		AudioManager.play_spawn()
 
 		# Notify quest manager
 		QuestManager.on_building_spawned()

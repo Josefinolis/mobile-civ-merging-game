@@ -114,6 +114,9 @@ func _on_quest_completed(quest: Dictionary) -> void:
 	_refresh_quests()
 	_show_completion_effect(quest)
 
+	# Play quest complete sound
+	AudioManager.play_quest_complete()
+
 	# Flash the title button
 	if title_button:
 		var tween = title_button.create_tween()

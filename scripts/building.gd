@@ -144,6 +144,9 @@ func _start_drag(mouse_pos: Vector2) -> void:
 	var tween = create_tween()
 	tween.tween_property(self, "scale", Vector2(1.1, 1.1), 0.1).set_ease(Tween.EASE_OUT)
 
+	# Play pickup sound
+	AudioManager.play_pickup()
+
 	drag_started.emit(self)
 
 func _update_drag(mouse_pos: Vector2) -> void:

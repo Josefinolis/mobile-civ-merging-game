@@ -83,6 +83,9 @@ func _on_building_unlocked(level: int) -> void:
 
 func _on_spawn_pressed() -> void:
 	if game_grid:
+		# Play button click sound
+		AudioManager.play_button_click()
+
 		# Button press animation
 		if spawn_button:
 			var tween = spawn_button.create_tween()
