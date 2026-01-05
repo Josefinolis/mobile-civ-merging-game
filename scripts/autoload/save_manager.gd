@@ -14,6 +14,17 @@ func save_game() -> void:
 		"highest_unlocked_level": GameManager.highest_unlocked_level,
 		"grid": _serialize_grid(),
 		"timestamp": Time.get_unix_time_from_system(),
+		# Audio settings
+		"music_enabled": AudioManager.is_music_enabled(),
+		"sfx_enabled": AudioManager.is_sfx_enabled(),
+		"music_volume": AudioManager.get_music_volume(),
+		"sfx_volume": AudioManager.get_sfx_volume(),
+		# Quest progress
+		"quest_total_builds": QuestManager.total_builds,
+		"quest_total_merges": QuestManager.total_merges,
+		"quest_total_coins_earned": QuestManager.total_coins_earned,
+		"quest_highest_building": QuestManager.highest_building_level,
+		"quest_completed_ids": QuestManager.completed_quest_ids,
 	}
 
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -51,6 +62,32 @@ func load_game() -> void:
 	# Restore grid
 	var grid_data: Array = save_data.get("grid", [])
 	_deserialize_grid(grid_data)
+
+	# Restore audio settings
+	if save_data.has("music_enabled"):
+		if AudioManager.is_music_enabled() != save_data.get("music_enabled", true):
+			AudioManager.toggle_music()
+	if save_data.has("sfx_enabled"):
+		if AudioManager.is_sfx_enabled() != save_data.get("sfx_enabled", true):
+			AudioManager.toggle_sfx()
+	if save_data.has("music_volume"):
+		AudioManager.set_music_volume(save_data.get("music_volume", 0.4))
+	if save_data.has("sfx_volume"):
+		AudioManager.set_sfx_volume(save_data.get("sfx_volume", 0.7))
+
+	# Restore quest progress
+	if save_data.has("quest_total_builds"):
+		QuestManager.total_builds = save_data.get("quest_total_builds", 0)
+	if save_data.has("quest_total_merges"):
+		QuestManager.total_merges = save_data.get("quest_total_merges", 0)
+	if save_data.has("quest_total_coins_earned"):
+		QuestManager.total_coins_earned = save_data.get("quest_total_coins_earned", 0)
+	if save_data.has("quest_highest_building"):
+		QuestManager.highest_building_level = save_data.get("quest_highest_building", 1)
+	if save_data.has("quest_completed_ids"):
+		QuestManager.completed_quest_ids = save_data.get("quest_completed_ids", [])
+		# Regenerate quests with completed IDs loaded
+		QuestManager._generate_quests()
 
 	# Calculate offline earnings
 	var saved_timestamp: float = save_data.get("timestamp", 0)

@@ -7,7 +7,8 @@ A mobile merge game where you combine buildings to create a thriving city. Built
 - **Tap "BUILD NEW"** to spawn new buildings (costs energy)
 - **Drag and drop** buildings onto matching buildings to merge them
 - **Higher level buildings** generate more coins per second
-- **Collect coins** to unlock new features (coming soon)
+- **Complete quests** to earn bonus coins and energy
+- **Adjust settings** via the gear icon to control music and SFX volume
 
 ## Building Progression
 
@@ -29,9 +30,12 @@ A mobile merge game where you combine buildings to create a thriving city. Built
 - Merge mechanics with 10 building tiers
 - Passive coin generation
 - Energy system with regeneration
-- Auto-save on exit
+- Quest system with rewards
+- Procedural sound effects and background music
+- Settings menu with volume controls
+- Particle effects and juicy animations
+- Auto-save on exit (includes audio preferences and quest progress)
 - Offline earnings (50% efficiency, max 8 hours)
-- Smooth animations and visual feedback
 
 ## Tech Stack
 
@@ -64,23 +68,26 @@ A mobile merge game where you combine buildings to create a thriving city. Built
 ```
 mobile-civ-merging-game/
 ├── scenes/
-│   ├── main.tscn          # Main game scene
-│   └── building.tscn      # Building prefab
+│   ├── main.tscn              # Main game scene
+│   └── building.tscn          # Building prefab
 ├── scripts/
 │   ├── autoload/
-│   │   ├── game_manager.gd  # Global game state
-│   │   └── save_manager.gd  # Save/load system
-│   ├── building.gd        # Building behavior
-│   ├── game_grid.gd       # Grid management
-│   └── ui_manager.gd      # UI handling
-├── assets/
-│   ├── sprites/
-│   ├── audio/
-│   └── fonts/
+│   │   ├── game_manager.gd    # Global game state
+│   │   ├── save_manager.gd    # Save/load system
+│   │   ├── quest_manager.gd   # Quest system
+│   │   └── audio_manager.gd   # Sound and music
+│   ├── effects/
+│   │   └── particle_effects.gd # Visual effects
+│   ├── ui/
+│   │   ├── quest_panel.gd     # Quest UI
+│   │   └── settings_panel.gd  # Settings UI
+│   ├── building.gd            # Building behavior
+│   ├── game_grid.gd           # Grid management
+│   └── ui_manager.gd          # UI handling
 ├── .github/
 │   └── workflows/
-│       └── release.yml    # CI/CD for APK builds
-├── project.godot          # Godot project file
+│       └── release.yml        # CI/CD for APK builds
+├── project.godot              # Godot project file
 └── README.md
 ```
 
@@ -94,7 +101,9 @@ Download the latest APK from the [Releases](../../releases) page.
 
 ## Roadmap
 
-- [ ] Sound effects and music
+- [x] Sound effects and music
+- [x] Quest system
+- [x] Settings menu
 - [ ] Achievement system
 - [ ] Daily rewards
 - [ ] Special events

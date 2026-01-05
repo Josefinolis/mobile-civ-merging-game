@@ -10,7 +10,7 @@ signal closed
 @onready var sfx_toggle: CheckButton = $MarginContainer/VBox/SFXRow/SFXToggle
 @onready var version_label: Label = $MarginContainer/VBox/VersionLabel
 
-const APP_VERSION = "1.0.0"
+const APP_VERSION = "1.0.4"
 
 func _ready() -> void:
 	# Setup initial values from AudioManager

@@ -42,6 +42,9 @@ var highest_unlocked_level: int = 1
 var grid_size: Vector2i = Vector2i(5, 7)
 var grid: Array = []  # 2D array of building levels (0 = empty)
 
+# Fractional coin accumulator (for smooth generation)
+var _coin_accumulator: float = 0.0
+
 func _ready() -> void:
 	_initialize_grid()
 	# Start with some coins
@@ -75,7 +78,13 @@ func _process_coin_generation(delta: float) -> void:
 				coins_to_add += building_data[level]["coins_per_sec"] * delta
 
 	if coins_to_add > 0:
-		coins += int(coins_to_add * 100) / 100.0  # Add fractional coins
+		# Accumulate fractional coins
+		_coin_accumulator += coins_to_add
+		# Only add whole coins to prevent precision issues
+		if _coin_accumulator >= 1.0:
+			var whole_coins = int(_coin_accumulator)
+			coins += whole_coins
+			_coin_accumulator -= whole_coins
 
 func get_building_at(pos: Vector2i) -> int:
 	if _is_valid_position(pos):
