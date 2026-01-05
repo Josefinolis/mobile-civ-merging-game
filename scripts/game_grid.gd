@@ -11,7 +11,7 @@ const BUILDING_SCENE_PATH = "res://scenes/building.tscn"
 
 var building_scene: PackedScene
 var buildings: Array = []  # 2D array of Building nodes
-var dragged_building: Building = null
+var dragged_building = null
 var highlight_cell: Vector2i = Vector2i(-1, -1)
 
 @onready var cells_container: Control = $CellsContainer
@@ -40,7 +40,7 @@ func _create_buildings() -> void:
 	for x in range(GameManager.grid_size.x):
 		var column: Array = []
 		for y in range(GameManager.grid_size.y):
-			var building: Building = building_scene.instantiate()
+			var building = building_scene.instantiate()
 			building.position = _grid_to_pixel(Vector2i(x, y))
 			building.custom_minimum_size = cell_size - cell_padding * 2
 			building.size = cell_size - cell_padding * 2
@@ -72,12 +72,12 @@ func _pixel_to_grid(pixel_pos: Vector2) -> Vector2i:
 		clamp(y, 0, GameManager.grid_size.y - 1)
 	)
 
-func _on_building_drag_started(building: Building) -> void:
+func _on_building_drag_started(building) -> void:
 	dragged_building = building
 	if highlight:
 		highlight.visible = true
 
-func _on_building_drag_ended(building: Building) -> void:
+func _on_building_drag_ended(building) -> void:
 	if highlight:
 		highlight.visible = false
 
@@ -90,7 +90,7 @@ func _on_building_drag_ended(building: Building) -> void:
 
 	# Check if we're dropping on a different cell
 	if target_grid_pos != building.grid_position:
-		var target_building: Building = buildings[target_grid_pos.x][target_grid_pos.y]
+		var target_building = buildings[target_grid_pos.x][target_grid_pos.y]
 		var target_level: int = GameManager.get_building_at(target_grid_pos)
 		var source_level: int = building.building_level
 
@@ -108,7 +108,7 @@ func _on_building_drag_ended(building: Building) -> void:
 
 	dragged_building = null
 
-func _perform_merge(source: Building, target: Building) -> void:
+func _perform_merge(source, target) -> void:
 	var new_level: int = GameManager.merge_result(source.building_level)
 
 	# Clear source position in game manager
@@ -126,7 +126,7 @@ func _perform_merge(source: Building, target: Building) -> void:
 
 	merge_completed.emit(new_level)
 
-func _move_building(source: Building, target_pos: Vector2i) -> void:
+func _move_building(source, target_pos: Vector2i) -> void:
 	var level: int = source.building_level
 	var old_pos: Vector2i = source.grid_position
 
@@ -135,7 +135,7 @@ func _move_building(source: Building, target_pos: Vector2i) -> void:
 	GameManager.set_building_at(target_pos, level)
 
 	# Update building references
-	var target_building: Building = buildings[target_pos.x][target_pos.y]
+	var target_building = buildings[target_pos.x][target_pos.y]
 
 	# Swap in array
 	buildings[old_pos.x][old_pos.y] = target_building
@@ -171,7 +171,7 @@ func spawn_new_building() -> bool:
 		# Find the newly spawned building and animate it
 		for x in range(GameManager.grid_size.x):
 			for y in range(GameManager.grid_size.y):
-				var building: Building = buildings[x][y]
+				var building = buildings[x][y]
 				if building.building_level > 0 and building.scale == Vector2.ZERO:
 					building.animate_spawn()
 		return true

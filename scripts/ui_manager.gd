@@ -6,7 +6,7 @@ class_name UIManager
 @onready var energy_label: Label = $TopBar/HBox/EnergyContainer/EnergyLabel
 @onready var income_label: Label = $TopBar/HBox/IncomeContainer/IncomeLabel
 @onready var spawn_button: Button = $BottomBar/HBox/SpawnButton
-@onready var game_grid: GameGrid = $GridContainer/GameGrid
+@onready var game_grid = $GridContainer/GameGrid
 
 var _coins_display: float = 0.0
 
