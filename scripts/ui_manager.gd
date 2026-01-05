@@ -6,7 +6,10 @@ class_name UIManager
 @onready var energy_label: Label = $TopBar/HBox/EnergyContainer/EnergyLabel
 @onready var income_label: Label = $TopBar/HBox/IncomeContainer/IncomeLabel
 @onready var spawn_button: Button = $BottomBar/HBox/SpawnButton
+@onready var settings_button: Button = $TopBar/HBox/SettingsButton
 @onready var game_grid = $GridContainer/GameGrid
+@onready var settings_panel = $SettingsPanel
+@onready var settings_overlay: ColorRect = $SettingsOverlay
 
 var _coins_display: float = 0.0
 
@@ -18,6 +21,15 @@ func _ready() -> void:
 
 	if spawn_button:
 		spawn_button.pressed.connect(_on_spawn_pressed)
+
+	if settings_button:
+		settings_button.pressed.connect(_on_settings_pressed)
+
+	if settings_panel:
+		settings_panel.closed.connect(_on_settings_closed)
+
+	if settings_overlay:
+		settings_overlay.gui_input.connect(_on_overlay_input)
 
 	if game_grid:
 		game_grid.merge_completed.connect(_on_merge_completed)
@@ -115,3 +127,41 @@ func _format_number(value: float) -> String:
 		return "%.1fK" % (value / 1000)
 	else:
 		return str(int(value))
+
+func _on_settings_pressed() -> void:
+	AudioManager.play_button_click()
+
+	# Button animation
+	if settings_button:
+		var tween = settings_button.create_tween()
+		tween.tween_property(settings_button, "rotation", 0.5, 0.2)
+		tween.tween_property(settings_button, "rotation", 0.0, 0.2)
+
+	_show_settings()
+
+func _show_settings() -> void:
+	if settings_overlay:
+		settings_overlay.visible = true
+		settings_overlay.modulate.a = 0
+		var tween = settings_overlay.create_tween()
+		tween.tween_property(settings_overlay, "modulate:a", 1.0, 0.2)
+
+	if settings_panel:
+		settings_panel.show_panel()
+
+func _hide_settings() -> void:
+	if settings_overlay:
+		var tween = settings_overlay.create_tween()
+		tween.tween_property(settings_overlay, "modulate:a", 0.0, 0.15)
+		tween.tween_callback(func(): settings_overlay.visible = false)
+
+	if settings_panel:
+		settings_panel.hide_panel()
+
+func _on_settings_closed() -> void:
+	_hide_settings()
+
+func _on_overlay_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		AudioManager.play_button_click()
+		_hide_settings()
