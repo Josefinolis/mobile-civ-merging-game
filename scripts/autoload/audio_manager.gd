@@ -1,5 +1,5 @@
 extends Node
-## AudioManager - Handles all game audio with procedurally generated sounds
+## AudioManager - Handles all game audio with pre-generated procedural sounds
 
 signal settings_changed
 
@@ -17,7 +17,14 @@ var sfx_volume: float = 0.7
 var sfx_enabled: bool = true
 var master_enabled: bool = true
 
+# Cached sounds (pre-generated at startup)
+var _cached_sounds: Dictionary = {}
+var _cached_music: AudioStreamWAV
+
 func _ready() -> void:
+	# Pre-generate all sounds at startup to avoid lag
+	_pregenerate_sounds()
+
 	# Create pool of audio players for SFX
 	for i in range(SFX_POOL_SIZE):
 		var player = AudioStreamPlayer.new()
@@ -34,6 +41,19 @@ func _ready() -> void:
 	# Start background music after a short delay
 	call_deferred("_start_background_music")
 
+func _pregenerate_sounds() -> void:
+	# Generate all sounds once at startup
+	_cached_sounds["spawn"] = _generate_spawn_sound()
+	_cached_sounds["merge"] = _generate_merge_sound()
+	_cached_sounds["levelup"] = _generate_levelup_sound()
+	_cached_sounds["click"] = _generate_click_sound()
+	_cached_sounds["pickup"] = _generate_pickup_sound()
+	_cached_sounds["drop"] = _generate_drop_sound()
+	_cached_sounds["error"] = _generate_error_sound()
+	_cached_sounds["coin"] = _generate_coin_sound()
+	_cached_sounds["quest_complete"] = _generate_quest_complete_sound()
+	_cached_music = _generate_ambient_music()
+
 func _get_available_player() -> AudioStreamPlayer:
 	for player in sfx_players:
 		if not player.playing:
@@ -47,7 +67,7 @@ func play_spawn() -> void:
 	if not master_enabled or not sfx_enabled:
 		return
 	var player = _get_available_player()
-	player.stream = _generate_spawn_sound()
+	player.stream = _cached_sounds["spawn"]
 	player.volume_db = linear_to_db(sfx_volume * 0.6)
 	player.pitch_scale = randf_range(0.95, 1.05)
 	player.play()
@@ -56,7 +76,7 @@ func play_merge() -> void:
 	if not master_enabled or not sfx_enabled:
 		return
 	var player = _get_available_player()
-	player.stream = _generate_merge_sound()
+	player.stream = _cached_sounds["merge"]
 	player.volume_db = linear_to_db(sfx_volume * 0.8)
 	player.pitch_scale = randf_range(0.98, 1.02)
 	player.play()
@@ -65,7 +85,7 @@ func play_level_up() -> void:
 	if not master_enabled or not sfx_enabled:
 		return
 	var player = _get_available_player()
-	player.stream = _generate_levelup_sound()
+	player.stream = _cached_sounds["levelup"]
 	player.volume_db = linear_to_db(sfx_volume)
 	player.play()
 
@@ -73,7 +93,7 @@ func play_button_click() -> void:
 	if not master_enabled or not sfx_enabled:
 		return
 	var player = _get_available_player()
-	player.stream = _generate_click_sound()
+	player.stream = _cached_sounds["click"]
 	player.volume_db = linear_to_db(sfx_volume * 0.5)
 	player.pitch_scale = randf_range(0.98, 1.02)
 	player.play()
@@ -82,7 +102,7 @@ func play_pickup() -> void:
 	if not master_enabled or not sfx_enabled:
 		return
 	var player = _get_available_player()
-	player.stream = _generate_pickup_sound()
+	player.stream = _cached_sounds["pickup"]
 	player.volume_db = linear_to_db(sfx_volume * 0.4)
 	player.pitch_scale = randf_range(0.95, 1.05)
 	player.play()
@@ -91,7 +111,7 @@ func play_drop() -> void:
 	if not master_enabled or not sfx_enabled:
 		return
 	var player = _get_available_player()
-	player.stream = _generate_drop_sound()
+	player.stream = _cached_sounds["drop"]
 	player.volume_db = linear_to_db(sfx_volume * 0.5)
 	player.play()
 
@@ -99,7 +119,7 @@ func play_error() -> void:
 	if not master_enabled or not sfx_enabled:
 		return
 	var player = _get_available_player()
-	player.stream = _generate_error_sound()
+	player.stream = _cached_sounds["error"]
 	player.volume_db = linear_to_db(sfx_volume * 0.4)
 	player.play()
 
@@ -107,7 +127,7 @@ func play_coin() -> void:
 	if not master_enabled or not sfx_enabled:
 		return
 	var player = _get_available_player()
-	player.stream = _generate_coin_sound()
+	player.stream = _cached_sounds["coin"]
 	player.volume_db = linear_to_db(sfx_volume * 0.3)
 	player.pitch_scale = randf_range(0.9, 1.1)
 	player.play()
@@ -116,52 +136,16 @@ func play_quest_complete() -> void:
 	if not master_enabled or not sfx_enabled:
 		return
 	var player = _get_available_player()
-	player.stream = _generate_quest_complete_sound()
+	player.stream = _cached_sounds["quest_complete"]
 	player.volume_db = linear_to_db(sfx_volume)
 	player.play()
 
-# === SOUND GENERATION ===
+# === IMPROVED SOUND GENERATION ===
 
 func _generate_spawn_sound() -> AudioStreamWAV:
-	# Rising "pop" sound
-	return _create_tone(440, 0.08, 0.3, true, 1.5)
-
-func _generate_merge_sound() -> AudioStreamWAV:
-	# Satisfying "whoosh + ding" combination
-	return _create_chord([523, 659, 784], 0.15, 0.5)  # C major chord
-
-func _generate_levelup_sound() -> AudioStreamWAV:
-	# Triumphant ascending notes
-	return _create_arpeggio([523, 659, 784, 1047], 0.12, 0.4)
-
-func _generate_click_sound() -> AudioStreamWAV:
-	# Short click
-	return _create_tone(800, 0.03, 0.2, false, 1.0)
-
-func _generate_pickup_sound() -> AudioStreamWAV:
-	# Soft rising tone
-	return _create_tone(330, 0.05, 0.2, true, 1.3)
-
-func _generate_drop_sound() -> AudioStreamWAV:
-	# Soft thud
-	return _create_tone(150, 0.08, 0.3, false, 0.7)
-
-func _generate_error_sound() -> AudioStreamWAV:
-	# Low buzz
-	return _create_tone(180, 0.1, 0.3, false, 1.0)
-
-func _generate_coin_sound() -> AudioStreamWAV:
-	# High pitched ding
-	return _create_tone(1200, 0.06, 0.2, false, 1.0)
-
-func _generate_quest_complete_sound() -> AudioStreamWAV:
-	# Fanfare-like arpeggio
-	return _create_arpeggio([523, 659, 784, 1047, 1319], 0.1, 0.5)
-
-# === AUDIO GENERATION HELPERS ===
-
-func _create_tone(frequency: float, duration: float, volume: float, pitch_rise: bool, rise_factor: float) -> AudioStreamWAV:
-	var sample_rate = 22050
+	# Pleasant "pop" with harmonics - like a bubble
+	var sample_rate = 44100
+	var duration = 0.12
 	var samples = int(duration * sample_rate)
 	var audio = AudioStreamWAV.new()
 	audio.mix_rate = sample_rate
@@ -175,69 +159,82 @@ func _create_tone(frequency: float, duration: float, volume: float, pitch_rise: 
 		var t = float(i) / sample_rate
 		var progress = float(i) / samples
 
-		# Frequency modulation for pitch rise
-		var freq = frequency
-		if pitch_rise:
-			freq = frequency * (1.0 + (rise_factor - 1.0) * progress)
+		# Rising frequency for pop effect
+		var base_freq = 400 + progress * 600
 
-		# Generate sine wave
-		var sample = sin(t * freq * TAU)
+		# Fundamental + harmonics for warmer sound
+		var sample = sin(t * base_freq * TAU) * 0.6
+		sample += sin(t * base_freq * 2 * TAU) * 0.25
+		sample += sin(t * base_freq * 3 * TAU) * 0.1
 
-		# Apply envelope (attack-decay)
-		var envelope = 1.0
-		if progress < 0.1:
-			envelope = progress / 0.1
-		else:
-			envelope = 1.0 - ((progress - 0.1) / 0.9)
-		envelope = envelope * envelope  # Smoother decay
-
-		sample = sample * envelope * volume
-
-		# Convert to 8-bit (0-255, with 128 as center)
-		data[i] = int((sample * 0.5 + 0.5) * 255)
-
-	audio.data = data
-	return audio
-
-func _create_chord(frequencies: Array, duration: float, volume: float) -> AudioStreamWAV:
-	var sample_rate = 22050
-	var samples = int(duration * sample_rate)
-	var audio = AudioStreamWAV.new()
-	audio.mix_rate = sample_rate
-	audio.format = AudioStreamWAV.FORMAT_8_BITS
-	audio.stereo = false
-
-	var data = PackedByteArray()
-	data.resize(samples)
-
-	for i in range(samples):
-		var t = float(i) / sample_rate
-		var progress = float(i) / samples
-
-		# Mix all frequencies
-		var sample = 0.0
-		for freq in frequencies:
-			sample += sin(t * freq * TAU)
-		sample = sample / frequencies.size()
-
-		# Envelope
+		# Quick attack, smooth decay envelope
 		var envelope = 1.0
 		if progress < 0.05:
 			envelope = progress / 0.05
 		else:
-			envelope = 1.0 - ((progress - 0.05) / 0.95)
-		envelope = pow(envelope, 1.5)
+			envelope = pow(1.0 - (progress - 0.05) / 0.95, 2.0)
 
-		sample = sample * envelope * volume
-		data[i] = int((sample * 0.5 + 0.5) * 255)
+		sample = sample * envelope * 0.4
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
 
 	audio.data = data
 	return audio
 
-func _create_arpeggio(frequencies: Array, note_duration: float, volume: float) -> AudioStreamWAV:
-	var sample_rate = 22050
-	var total_duration = note_duration * frequencies.size()
+func _generate_merge_sound() -> AudioStreamWAV:
+	# Satisfying major chord with shimmer
+	var sample_rate = 44100
+	var duration = 0.25
+	var samples = int(duration * sample_rate)
+	var audio = AudioStreamWAV.new()
+	audio.mix_rate = sample_rate
+	audio.format = AudioStreamWAV.FORMAT_8_BITS
+	audio.stereo = false
+
+	var data = PackedByteArray()
+	data.resize(samples)
+
+	# C major chord frequencies (C5, E5, G5)
+	var frequencies = [523.25, 659.25, 783.99]
+
+	for i in range(samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / samples
+
+		var sample = 0.0
+		for j in range(frequencies.size()):
+			var freq = frequencies[j]
+			# Add slight detuning for richness
+			var detune = sin(t * 3.0 + j * 2.0) * 2.0
+			# Fundamental
+			sample += sin(t * (freq + detune) * TAU) * 0.4
+			# Soft overtone
+			sample += sin(t * (freq + detune) * 2 * TAU) * 0.15
+
+		sample = sample / frequencies.size()
+
+		# Envelope with quick attack, sustain, decay
+		var envelope = 1.0
+		if progress < 0.02:
+			envelope = progress / 0.02
+		elif progress < 0.3:
+			envelope = 1.0
+		else:
+			envelope = pow(1.0 - (progress - 0.3) / 0.7, 1.5)
+
+		sample = sample * envelope * 0.5
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
+
+	audio.data = data
+	return audio
+
+func _generate_levelup_sound() -> AudioStreamWAV:
+	# Triumphant ascending arpeggio
+	var sample_rate = 44100
+	var note_duration = 0.1
+	var frequencies = [523.25, 659.25, 783.99, 1046.5]  # C5, E5, G5, C6
+	var total_duration = note_duration * frequencies.size() + 0.15
 	var samples = int(total_duration * sample_rate)
+
 	var audio = AudioStreamWAV.new()
 	audio.mix_rate = sample_rate
 	audio.format = AudioStreamWAV.FORMAT_8_BITS
@@ -250,28 +247,261 @@ func _create_arpeggio(frequencies: Array, note_duration: float, volume: float) -
 		var t = float(i) / sample_rate
 		var overall_progress = float(i) / samples
 
-		# Determine which note we're on
-		var note_index = int(t / note_duration)
-		note_index = min(note_index, frequencies.size() - 1)
-		var note_t = fmod(t, note_duration)
-		var note_progress = note_t / note_duration
+		var sample = 0.0
 
-		var freq = frequencies[note_index]
-		var sample = sin(t * freq * TAU)
+		# Layer multiple notes with overlap
+		for note_idx in range(frequencies.size()):
+			var note_start = note_idx * note_duration
+			var note_end = note_start + note_duration * 2.0
 
-		# Per-note envelope
-		var envelope = 1.0
-		if note_progress < 0.1:
-			envelope = note_progress / 0.1
-		else:
-			envelope = 1.0 - ((note_progress - 0.1) / 0.9) * 0.5
+			if t >= note_start and t < note_end:
+				var note_t = t - note_start
+				var note_progress = note_t / (note_duration * 2.0)
+				var freq = frequencies[note_idx]
 
-		# Overall fade out
+				# Note with harmonics
+				var note_sample = sin(note_t * freq * TAU) * 0.5
+				note_sample += sin(note_t * freq * 2 * TAU) * 0.2
+
+				# Per-note envelope
+				var note_env = 1.0
+				if note_progress < 0.1:
+					note_env = note_progress / 0.1
+				else:
+					note_env = pow(1.0 - (note_progress - 0.1) / 0.9, 2.0)
+
+				sample += note_sample * note_env
+
+		# Overall envelope
+		var master_env = 1.0
 		if overall_progress > 0.7:
-			envelope *= 1.0 - ((overall_progress - 0.7) / 0.3)
+			master_env = 1.0 - (overall_progress - 0.7) / 0.3
 
-		sample = sample * envelope * volume
-		data[i] = int((sample * 0.5 + 0.5) * 255)
+		sample = sample * master_env * 0.4
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
+
+	audio.data = data
+	return audio
+
+func _generate_click_sound() -> AudioStreamWAV:
+	# Soft, pleasant click
+	var sample_rate = 44100
+	var duration = 0.05
+	var samples = int(duration * sample_rate)
+	var audio = AudioStreamWAV.new()
+	audio.mix_rate = sample_rate
+	audio.format = AudioStreamWAV.FORMAT_8_BITS
+	audio.stereo = false
+
+	var data = PackedByteArray()
+	data.resize(samples)
+
+	for i in range(samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / samples
+
+		# High frequency click with quick decay
+		var freq = 1200 - progress * 400
+		var sample = sin(t * freq * TAU) * 0.5
+		sample += sin(t * freq * 0.5 * TAU) * 0.3
+
+		# Very quick envelope
+		var envelope = pow(1.0 - progress, 3.0)
+
+		sample = sample * envelope * 0.3
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
+
+	audio.data = data
+	return audio
+
+func _generate_pickup_sound() -> AudioStreamWAV:
+	# Gentle rising tone - like picking up something light
+	var sample_rate = 44100
+	var duration = 0.08
+	var samples = int(duration * sample_rate)
+	var audio = AudioStreamWAV.new()
+	audio.mix_rate = sample_rate
+	audio.format = AudioStreamWAV.FORMAT_8_BITS
+	audio.stereo = false
+
+	var data = PackedByteArray()
+	data.resize(samples)
+
+	for i in range(samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / samples
+
+		# Rising frequency
+		var freq = 350 + progress * 250
+		var sample = sin(t * freq * TAU) * 0.6
+		sample += sin(t * freq * 2 * TAU) * 0.2
+
+		# Smooth envelope
+		var envelope = sin(progress * PI)
+
+		sample = sample * envelope * 0.3
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
+
+	audio.data = data
+	return audio
+
+func _generate_drop_sound() -> AudioStreamWAV:
+	# Soft thud - like placing something down
+	var sample_rate = 44100
+	var duration = 0.1
+	var samples = int(duration * sample_rate)
+	var audio = AudioStreamWAV.new()
+	audio.mix_rate = sample_rate
+	audio.format = AudioStreamWAV.FORMAT_8_BITS
+	audio.stereo = false
+
+	var data = PackedByteArray()
+	data.resize(samples)
+
+	for i in range(samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / samples
+
+		# Low frequency thud with pitch drop
+		var freq = 200 - progress * 100
+		var sample = sin(t * freq * TAU) * 0.7
+		sample += sin(t * freq * 0.5 * TAU) * 0.3
+
+		# Quick decay envelope
+		var envelope = pow(1.0 - progress, 2.5)
+
+		sample = sample * envelope * 0.4
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
+
+	audio.data = data
+	return audio
+
+func _generate_error_sound() -> AudioStreamWAV:
+	# Gentle "nope" sound - two descending tones
+	var sample_rate = 44100
+	var duration = 0.15
+	var samples = int(duration * sample_rate)
+	var audio = AudioStreamWAV.new()
+	audio.mix_rate = sample_rate
+	audio.format = AudioStreamWAV.FORMAT_8_BITS
+	audio.stereo = false
+
+	var data = PackedByteArray()
+	data.resize(samples)
+
+	for i in range(samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / samples
+
+		# Two-tone descending
+		var freq1 = 400 if progress < 0.5 else 300
+		var sample = sin(t * freq1 * TAU) * 0.5
+		sample += sin(t * freq1 * 0.5 * TAU) * 0.3
+
+		# Envelope with gap between tones
+		var envelope = 1.0
+		if progress < 0.45:
+			envelope = 1.0 - pow(progress / 0.45, 0.5) * 0.3
+		elif progress < 0.55:
+			envelope = 0.3
+		else:
+			envelope = 0.7 * pow(1.0 - (progress - 0.55) / 0.45, 2.0)
+
+		sample = sample * envelope * 0.3
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
+
+	audio.data = data
+	return audio
+
+func _generate_coin_sound() -> AudioStreamWAV:
+	# Pleasant coin ding
+	var sample_rate = 44100
+	var duration = 0.15
+	var samples = int(duration * sample_rate)
+	var audio = AudioStreamWAV.new()
+	audio.mix_rate = sample_rate
+	audio.format = AudioStreamWAV.FORMAT_8_BITS
+	audio.stereo = false
+
+	var data = PackedByteArray()
+	data.resize(samples)
+
+	for i in range(samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / samples
+
+		# Bell-like sound with harmonics
+		var freq = 880.0  # A5
+		var sample = sin(t * freq * TAU) * 0.4
+		sample += sin(t * freq * 2.0 * TAU) * 0.25
+		sample += sin(t * freq * 3.0 * TAU) * 0.15
+		sample += sin(t * freq * 4.0 * TAU) * 0.1
+
+		# Bell envelope - quick attack, long decay
+		var envelope = 1.0
+		if progress < 0.01:
+			envelope = progress / 0.01
+		else:
+			envelope = pow(1.0 - (progress - 0.01) / 0.99, 1.5)
+
+		sample = sample * envelope * 0.35
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
+
+	audio.data = data
+	return audio
+
+func _generate_quest_complete_sound() -> AudioStreamWAV:
+	# Celebratory fanfare
+	var sample_rate = 44100
+	var note_duration = 0.12
+	var frequencies = [523.25, 659.25, 783.99, 1046.5, 1318.5]  # C5, E5, G5, C6, E6
+	var total_duration = note_duration * frequencies.size() + 0.2
+	var samples = int(total_duration * sample_rate)
+
+	var audio = AudioStreamWAV.new()
+	audio.mix_rate = sample_rate
+	audio.format = AudioStreamWAV.FORMAT_8_BITS
+	audio.stereo = false
+
+	var data = PackedByteArray()
+	data.resize(samples)
+
+	for i in range(samples):
+		var t = float(i) / sample_rate
+		var overall_progress = float(i) / samples
+
+		var sample = 0.0
+
+		for note_idx in range(frequencies.size()):
+			var note_start = note_idx * note_duration
+			var note_end = note_start + note_duration * 2.5
+
+			if t >= note_start and t < note_end:
+				var note_t = t - note_start
+				var note_progress = note_t / (note_duration * 2.5)
+				var freq = frequencies[note_idx]
+
+				# Rich sound with harmonics
+				var note_sample = sin(note_t * freq * TAU) * 0.4
+				note_sample += sin(note_t * freq * 2 * TAU) * 0.2
+				note_sample += sin(note_t * freq * 3 * TAU) * 0.1
+
+				# Per-note envelope
+				var note_env = 1.0
+				if note_progress < 0.05:
+					note_env = note_progress / 0.05
+				else:
+					note_env = pow(1.0 - (note_progress - 0.05) / 0.95, 1.5)
+
+				sample += note_sample * note_env
+
+		# Overall envelope
+		var master_env = 1.0
+		if overall_progress > 0.75:
+			master_env = 1.0 - (overall_progress - 0.75) / 0.25
+
+		sample = sample * master_env * 0.4
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
 
 	audio.data = data
 	return audio
@@ -279,20 +509,18 @@ func _create_arpeggio(frequencies: Array, note_duration: float, volume: float) -
 # === MUSIC ===
 
 func _start_background_music() -> void:
-	if music_enabled and music_player:
-		music_player.stream = _generate_ambient_music()
+	if music_enabled and music_player and _cached_music:
+		music_player.stream = _cached_music
 		music_player.volume_db = linear_to_db(music_volume * 0.5)
 		music_player.play()
 
 func _on_music_finished() -> void:
-	# Loop the music
 	if music_enabled:
 		_start_background_music()
 
 func _generate_ambient_music() -> AudioStreamWAV:
-	# Generate relaxing ambient music - slow evolving pads
 	var sample_rate = 22050
-	var duration = 30.0  # 30 seconds of music
+	var duration = 30.0
 	var samples = int(duration * sample_rate)
 
 	var audio = AudioStreamWAV.new()
@@ -303,11 +531,11 @@ func _generate_ambient_music() -> AudioStreamWAV:
 	var data = PackedByteArray()
 	data.resize(samples)
 
-	# Chord progression (relaxing minor/major mix)
+	# Relaxing chord progression
 	var chords = [
 		[261.63, 329.63, 392.00],  # C major
 		[220.00, 277.18, 329.63],  # A minor
-		[246.94, 311.13, 369.99],  # B minor (soft)
+		[246.94, 311.13, 369.99],  # B dim (softer)
 		[196.00, 246.94, 293.66],  # G major
 	]
 
@@ -318,28 +546,24 @@ func _generate_ambient_music() -> AudioStreamWAV:
 		var t = float(i) / sample_rate
 		var overall_progress = float(i) / samples
 
-		# Determine current chord
 		var chord_index = int(i / samples_per_chord) % chords.size()
 		var chord = chords[chord_index]
 		var chord_progress = fmod(float(i), samples_per_chord) / samples_per_chord
 
-		# Mix frequencies with slow LFO modulation
 		var sample = 0.0
 		for j in range(chord.size()):
 			var freq = chord[j]
-			# Add slight detuning for warmth
-			var detune = sin(t * 0.1 + j) * 2.0
-			# Slow tremolo
-			var tremolo = 0.8 + 0.2 * sin(t * (0.5 + j * 0.1))
+			var detune = sin(t * 0.1 + j) * 1.5
+			var tremolo = 0.85 + 0.15 * sin(t * (0.3 + j * 0.05))
 			sample += sin(t * (freq + detune) * TAU) * tremolo
 
 		sample = sample / chord.size()
 
-		# Add sub bass
+		# Sub bass
 		var bass_freq = chord[0] / 2.0
-		sample += sin(t * bass_freq * TAU) * 0.3
+		sample += sin(t * bass_freq * TAU) * 0.25
 
-		# Gentle envelope for chord transitions
+		# Chord transition envelope
 		var envelope = 1.0
 		if chord_progress < 0.1:
 			envelope = chord_progress / 0.1
@@ -347,16 +571,16 @@ func _generate_ambient_music() -> AudioStreamWAV:
 			envelope = (1.0 - chord_progress) / 0.1
 		envelope = smoothstep(0.0, 1.0, envelope)
 
-		# Overall fade in/out
+		# Master envelope
 		var master_env = 1.0
 		if overall_progress < 0.05:
 			master_env = overall_progress / 0.05
 		elif overall_progress > 0.95:
 			master_env = (1.0 - overall_progress) / 0.05
 
-		sample = sample * envelope * master_env * 0.3
+		sample = sample * envelope * master_env * 0.25
 
-		data[i] = int((sample * 0.5 + 0.5) * 255)
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
 
 	audio.data = data
 	return audio
