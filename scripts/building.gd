@@ -68,6 +68,11 @@ func _start_drag(mouse_pos: Vector2) -> void:
 	drag_offset = mouse_pos
 	original_position = position
 	z_index = 100  # Bring to front while dragging
+
+	# Pickup animation - scale up slightly
+	var tween = create_tween()
+	tween.tween_property(self, "scale", Vector2(1.1, 1.1), 0.1).set_ease(Tween.EASE_OUT)
+
 	drag_started.emit(self)
 
 func _update_drag(mouse_pos: Vector2) -> void:
@@ -82,16 +87,71 @@ func _end_drag() -> void:
 	drag_ended.emit(self)
 
 func reset_position() -> void:
-	position = original_position
+	# Bounce back animation when can't merge
+	var tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_ELASTIC)
+	tween.tween_property(self, "position", original_position, 0.3)
+	tween.parallel().tween_property(self, "scale", Vector2(1.0, 1.0), 0.2)
+
+	# Shake effect
+	tween.tween_property(self, "rotation", 0.1, 0.05)
+	tween.tween_property(self, "rotation", -0.1, 0.05)
+	tween.tween_property(self, "rotation", 0.0, 0.05)
 
 func animate_merge() -> void:
+	# Juicy merge animation with multiple phases
 	var tween = create_tween()
-	tween.tween_property(self, "scale", Vector2(1.3, 1.3), 0.1)
-	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.1)
+
+	# Phase 1: Quick squash
+	tween.tween_property(self, "scale", Vector2(0.8, 1.2), 0.08)
+
+	# Phase 2: Expand with overshoot
+	tween.tween_property(self, "scale", Vector2(1.4, 1.4), 0.12).set_ease(Tween.EASE_OUT)
+
+	# Phase 3: Bounce back
+	tween.tween_property(self, "scale", Vector2(0.95, 0.95), 0.08)
+	tween.tween_property(self, "scale", Vector2(1.05, 1.05), 0.06)
+	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.06)
+
+	# Flash effect
+	if sprite:
+		tween.parallel().tween_property(sprite, "modulate", Color(2, 2, 2, 1), 0.1)
+		tween.tween_property(sprite, "modulate", Color(1, 1, 1, 1), 0.2)
 
 func animate_spawn() -> void:
 	scale = Vector2.ZERO
+	modulate.a = 0
+	rotation = -0.2
+
 	var tween = create_tween()
 	tween.set_ease(Tween.EASE_OUT)
 	tween.set_trans(Tween.TRANS_BACK)
-	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.3)
+
+	# Pop in with rotation
+	tween.tween_property(self, "scale", Vector2(1.15, 1.15), 0.25)
+	tween.parallel().tween_property(self, "modulate:a", 1.0, 0.15)
+	tween.parallel().tween_property(self, "rotation", 0.05, 0.25)
+
+	# Settle
+	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.15)
+	tween.parallel().tween_property(self, "rotation", 0.0, 0.15)
+
+func animate_invalid_drop() -> void:
+	# Red flash and shake for invalid action
+	var tween = create_tween()
+	if sprite:
+		tween.tween_property(sprite, "modulate", Color(1.5, 0.5, 0.5, 1), 0.1)
+		tween.tween_property(sprite, "modulate", Color(1, 1, 1, 1), 0.2)
+
+	tween.parallel().tween_property(self, "position:x", position.x + 5, 0.03)
+	tween.tween_property(self, "position:x", position.x - 5, 0.03)
+	tween.tween_property(self, "position:x", position.x + 3, 0.03)
+	tween.tween_property(self, "position:x", position.x, 0.03)
+
+func get_center_position() -> Vector2:
+	return position + size / 2
+
+func get_building_color() -> Color:
+	var data: Dictionary = GameManager.building_data.get(building_level, {})
+	return data.get("color", Color.WHITE)

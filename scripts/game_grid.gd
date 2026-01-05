@@ -110,6 +110,8 @@ func _on_building_drag_ended(building) -> void:
 
 func _perform_merge(source, target) -> void:
 	var new_level: int = GameManager.merge_result(source.building_level)
+	var merge_color: Color = source.get_building_color()
+	var merge_position: Vector2 = target.get_center_position()
 
 	# Clear source position in game manager
 	GameManager.clear_building_at(source.grid_position)
@@ -123,6 +125,18 @@ func _perform_merge(source, target) -> void:
 
 	target.setup(new_level, target.grid_position)
 	target.animate_merge()
+
+	# Create particle effects
+	ParticleEffects.create_merge_particles(self, merge_position, merge_color)
+	ParticleEffects.create_coin_particles(self, merge_position, 3)
+
+	# Show level up text
+	var data = GameManager.building_data.get(new_level, {})
+	var building_name = data.get("name", "Building")
+	ParticleEffects.create_level_up_text(self, merge_position - Vector2(40, 30), new_level, building_name)
+
+	# Notify quest manager
+	QuestManager.on_merge_completed(new_level)
 
 	merge_completed.emit(new_level)
 
@@ -174,6 +188,12 @@ func spawn_new_building() -> bool:
 				var building = buildings[x][y]
 				if building.building_level > 0 and building.scale == Vector2.ZERO:
 					building.animate_spawn()
+					# Add spawn effect
+					var spawn_pos = building.position
+					ParticleEffects.create_spawn_effect(self, spawn_pos, building.size)
+
+		# Notify quest manager
+		QuestManager.on_building_spawned()
 		return true
 	return false
 

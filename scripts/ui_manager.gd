@@ -47,14 +47,33 @@ func _update_ui() -> void:
 		spawn_button.disabled = GameManager.energy <= 0
 
 func _on_coins_changed(new_amount: int) -> void:
-	# Animation handled in _process
-	pass
+	# Pulse animation on coin label when coins change significantly
+	if coins_label and abs(new_amount - _coins_display) > 1:
+		var tween = coins_label.create_tween()
+		tween.tween_property(coins_label, "scale", Vector2(1.2, 1.2), 0.1)
+		tween.tween_property(coins_label, "scale", Vector2(1.0, 1.0), 0.1)
 
 func _on_energy_changed(new_amount: int) -> void:
 	if energy_label:
 		energy_label.text = "%d/%d" % [new_amount, GameManager.max_energy]
+
+		# Pulse animation on energy change
+		var tween = energy_label.create_tween()
+		if new_amount < GameManager.max_energy:
+			# Red pulse when energy used
+			tween.tween_property(energy_label, "modulate", Color(1.5, 0.7, 0.7, 1), 0.1)
+		else:
+			# Green pulse when energy full
+			tween.tween_property(energy_label, "modulate", Color(0.7, 1.5, 0.7, 1), 0.1)
+		tween.tween_property(energy_label, "modulate", Color(1, 1, 1, 1), 0.2)
+
 	if spawn_button:
 		spawn_button.disabled = new_amount <= 0
+		# Visual feedback when button becomes disabled/enabled
+		if new_amount <= 0:
+			spawn_button.modulate = Color(0.5, 0.5, 0.5, 1)
+		else:
+			spawn_button.modulate = Color(1, 1, 1, 1)
 
 func _on_building_unlocked(level: int) -> void:
 	var data = GameManager.building_data.get(level, {})
@@ -64,7 +83,20 @@ func _on_building_unlocked(level: int) -> void:
 
 func _on_spawn_pressed() -> void:
 	if game_grid:
-		game_grid.spawn_new_building()
+		# Button press animation
+		if spawn_button:
+			var tween = spawn_button.create_tween()
+			tween.tween_property(spawn_button, "scale", Vector2(0.9, 0.9), 0.05)
+			tween.tween_property(spawn_button, "scale", Vector2(1.05, 1.05), 0.1)
+			tween.tween_property(spawn_button, "scale", Vector2(1.0, 1.0), 0.05)
+
+		if game_grid.spawn_new_building():
+			# Success feedback - flash the button green briefly
+			if spawn_button:
+				var original_color = spawn_button.modulate
+				var tween2 = spawn_button.create_tween()
+				tween2.tween_property(spawn_button, "modulate", Color(0.5, 1.5, 0.5, 1), 0.1)
+				tween2.tween_property(spawn_button, "modulate", original_color, 0.2)
 
 func _on_merge_completed(new_level: int) -> void:
 	# Could play sound or show effect
