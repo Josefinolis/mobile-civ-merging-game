@@ -25,6 +25,10 @@ func save_game() -> void:
 		"quest_total_coins_earned": QuestManager.total_coins_earned,
 		"quest_highest_building": QuestManager.highest_building_level,
 		"quest_completed_ids": QuestManager.completed_quest_ids,
+		# Shop upgrades
+		"shop_data": ShopManager.serialize(),
+		# Daily rewards
+		"daily_reward_data": DailyRewardManager.serialize(),
 	}
 
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -36,6 +40,8 @@ func save_game() -> void:
 func load_game() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
 		print("No save file found, starting fresh")
+		# Initialize daily rewards for new players
+		DailyRewardManager.check_reward_availability()
 		return
 
 	var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
@@ -89,6 +95,17 @@ func load_game() -> void:
 		# Regenerate quests with completed IDs loaded
 		QuestManager._generate_quests()
 
+	# Restore shop upgrades
+	if save_data.has("shop_data"):
+		ShopManager.deserialize(save_data.get("shop_data", {}))
+
+	# Restore daily rewards
+	if save_data.has("daily_reward_data"):
+		DailyRewardManager.deserialize(save_data.get("daily_reward_data", {}))
+	else:
+		# If no save data, check availability for new players
+		DailyRewardManager.check_reward_availability()
+
 	# Calculate offline earnings
 	var saved_timestamp: float = save_data.get("timestamp", 0)
 	if saved_timestamp > 0:
@@ -122,7 +139,13 @@ func _calculate_offline_earnings(saved_timestamp: float) -> void:
 
 	if elapsed_seconds > 60:  # Only calculate if away for more than a minute
 		var coins_per_second = GameManager.get_coins_per_second()
-		var offline_coins = int(coins_per_second * elapsed_seconds * 0.5)  # 50% efficiency offline
+
+		# Use ShopManager's offline earnings multiplier
+		var offline_efficiency: float = 0.5  # Default 50%
+		if ShopManager:
+			offline_efficiency = ShopManager.get_offline_earnings_multiplier()
+
+		var offline_coins = int(coins_per_second * elapsed_seconds * offline_efficiency)
 
 		if offline_coins > 0:
 			GameManager.coins += offline_coins

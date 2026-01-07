@@ -78,6 +78,15 @@ func _process_coin_generation(delta: float) -> void:
 				coins_to_add += building_data[level]["coins_per_sec"] * delta
 
 	if coins_to_add > 0:
+		# Apply multipliers from upgrades and bonuses
+		var coin_multiplier: float = 1.0
+		if ShopManager:
+			coin_multiplier *= ShopManager.get_coin_multiplier()
+		if DailyRewardManager:
+			coin_multiplier *= DailyRewardManager.get_active_coin_bonus()
+
+		coins_to_add *= coin_multiplier
+
 		# Accumulate fractional coins
 		_coin_accumulator += coins_to_add
 		# Only add whole coins to prevent precision issues
@@ -107,7 +116,13 @@ func can_merge(level1: int, level2: int) -> bool:
 
 func merge_result(level: int) -> int:
 	if level < max_building_level:
-		return level + 1
+		var new_level: int = level + 1
+
+		# Check for critical merge (skip a level)
+		if ShopManager and ShopManager.roll_critical_merge():
+			new_level = min(level + 2, max_building_level)
+
+		return new_level
 	return level
 
 func spawn_building() -> bool:
@@ -125,8 +140,15 @@ func spawn_building() -> bool:
 
 	energy -= 1
 	var pos: Vector2i = empty_positions[randi() % empty_positions.size()]
-	# Spawn level 1 (tent) mostly, sometimes level 2
-	var spawn_level: int = 1 if randf() > 0.2 else 2
+
+	# Use ShopManager's spawn level upgrade if available
+	var spawn_level: int = 1
+	if ShopManager:
+		spawn_level = ShopManager.roll_spawn_level()
+	else:
+		# Fallback: Spawn level 1 mostly, sometimes level 2
+		spawn_level = 1 if randf() > 0.2 else 2
+
 	set_building_at(pos, spawn_level)
 	return true
 
@@ -140,4 +162,12 @@ func get_coins_per_second() -> float:
 			var level: int = grid[x][y]
 			if level > 0 and building_data.has(level):
 				total += building_data[level]["coins_per_sec"]
-	return total
+
+	# Apply multipliers from upgrades and bonuses
+	var coin_multiplier: float = 1.0
+	if ShopManager:
+		coin_multiplier *= ShopManager.get_coin_multiplier()
+	if DailyRewardManager:
+		coin_multiplier *= DailyRewardManager.get_active_coin_bonus()
+
+	return total * coin_multiplier

@@ -6,7 +6,7 @@ El juego funciona correctamente en local y la APK se genera via GitHub Actions.
 
 ## Repositorio
 - **URL**: https://github.com/Josefinolis/mobile-civ-merging-game
-- **Última versión**: v1.0.4
+- **Última versión**: v1.1.0
 - **Release**: https://github.com/Josefinolis/mobile-civ-merging-game/releases
 
 ## Lo que está implementado
@@ -43,6 +43,24 @@ El juego funciona correctamente en local y la APK se genera via GitHub Actions.
 - [x] Auto-reemplazo al completar
 - [x] Persistencia de progreso
 
+### Shop System (v1.1.0)
+- [x] 6 tipos de mejoras comprables
+  - Coin Boost: Multiplicador de generación de monedas
+  - Energy Tank: Aumenta energía máxima
+  - Fast Charge: Regeneración de energía más rápida
+  - Lucky Spawn: Chance de spawnear edificios de mayor nivel
+  - Idle Income: Mejora ganancias offline
+  - Super Merge: Chance de saltar un nivel al hacer merge
+- [x] Costos que escalan exponencialmente
+- [x] Persistencia de upgrades compradas
+
+### Daily Rewards (v1.1.0)
+- [x] Sistema de recompensas diarias de 7 días
+- [x] Ciclo que se repite cada semana
+- [x] Recompensas crecientes (monedas + energía)
+- [x] Bonus x2 monedas temporales en día 7
+- [x] Persistencia del streak y estado
+
 ### CI/CD
 - [x] Workflow para generar APK automáticamente
 - [x] Debug keystore generado en CI
@@ -61,12 +79,16 @@ mobile-civ-merging-game/
 │   │   ├── game_manager.gd    # Estado global del juego
 │   │   ├── save_manager.gd    # Guardado/carga
 │   │   ├── quest_manager.gd   # Sistema de misiones
-│   │   └── audio_manager.gd   # Audio y música
+│   │   ├── audio_manager.gd   # Audio y música
+│   │   ├── shop_manager.gd    # Sistema de tienda y upgrades
+│   │   └── daily_reward_manager.gd # Recompensas diarias
 │   ├── effects/
 │   │   └── particle_effects.gd # Efectos visuales
 │   ├── ui/
 │   │   ├── quest_panel.gd     # Panel de misiones
-│   │   └── settings_panel.gd  # Panel de ajustes
+│   │   ├── settings_panel.gd  # Panel de ajustes
+│   │   ├── shop_panel.gd      # Panel de tienda
+│   │   └── daily_reward_panel.gd # Panel de recompensas
 │   ├── building.gd            # Comportamiento de edificio
 │   ├── game_grid.gd           # Gestión del grid
 │   └── ui_manager.gd          # UI y botones
@@ -105,6 +127,7 @@ git tag v1.0.X && git push --tags
 | v1.0.2 | 2026-01-04 | Import de recursos antes de exportar |
 | v1.0.3 | 2026-01-05 | Background music y settings menu |
 | v1.0.4 | 2026-01-05 | Docs update, persistencia audio/quests, bug fixes |
+| v1.1.0 | 2026-01-07 | Shop system con 6 upgrades, daily rewards de 7 días |
 
 ## Notas técnicas
 

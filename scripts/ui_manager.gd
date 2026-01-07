@@ -6,12 +6,17 @@ class_name UIManager
 @onready var energy_label: Label = $TopBar/HBox/EnergyContainer/EnergyLabel
 @onready var income_label: Label = $TopBar/HBox/IncomeContainer/IncomeLabel
 @onready var spawn_button: Button = $BottomBar/HBox/SpawnButton
+@onready var shop_button: Button = $BottomBar/HBox/ShopButton
+@onready var daily_reward_button: Button = $BottomBar/HBox/DailyRewardButton
 @onready var settings_button: Button = $TopBar/HBox/SettingsButton
 @onready var game_grid = $GridContainer/GameGrid
 @onready var settings_panel = $SettingsPanel
+@onready var shop_panel = $ShopPanel
+@onready var daily_reward_panel = $DailyRewardPanel
 @onready var settings_overlay: ColorRect = $SettingsOverlay
 
 var _coins_display: float = 0.0
+var _active_panel: String = ""  # Track which panel is open
 
 func _ready() -> void:
 	# Connect signals
@@ -28,14 +33,31 @@ func _ready() -> void:
 	if settings_panel:
 		settings_panel.closed.connect(_on_settings_closed)
 
+	if shop_button:
+		shop_button.pressed.connect(_on_shop_pressed)
+
+	if shop_panel:
+		shop_panel.closed.connect(_on_shop_closed)
+
+	if daily_reward_button:
+		daily_reward_button.pressed.connect(_on_daily_reward_pressed)
+
+	if daily_reward_panel:
+		daily_reward_panel.closed.connect(_on_daily_reward_closed)
+
 	if settings_overlay:
 		settings_overlay.gui_input.connect(_on_overlay_input)
 
 	if game_grid:
 		game_grid.merge_completed.connect(_on_merge_completed)
 
+	# Connect daily reward signals for button notification
+	DailyRewardManager.reward_available.connect(_on_reward_available)
+	DailyRewardManager.reward_claimed.connect(_on_reward_claimed)
+
 	# Initial UI update
 	_update_ui()
+	_update_daily_button_notification()
 
 func _process(delta: float) -> void:
 	# Smooth coin counter animation
@@ -140,6 +162,8 @@ func _on_settings_pressed() -> void:
 	_show_settings()
 
 func _show_settings() -> void:
+	_active_panel = "settings"
+
 	if settings_overlay:
 		settings_overlay.visible = true
 		settings_overlay.modulate.a = 0
@@ -158,10 +182,114 @@ func _hide_settings() -> void:
 	if settings_panel:
 		settings_panel.hide_panel()
 
+	_active_panel = ""
+
 func _on_settings_closed() -> void:
 	_hide_settings()
 
 func _on_overlay_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		AudioManager.play_button_click()
-		_hide_settings()
+		_hide_active_panel()
+
+# Shop panel functions
+func _on_shop_pressed() -> void:
+	AudioManager.play_button_click()
+
+	# Button animation
+	if shop_button:
+		var tween = shop_button.create_tween()
+		tween.tween_property(shop_button, "scale", Vector2(0.9, 0.9), 0.05)
+		tween.tween_property(shop_button, "scale", Vector2(1.05, 1.05), 0.1)
+		tween.tween_property(shop_button, "scale", Vector2(1.0, 1.0), 0.05)
+
+	_show_shop()
+
+func _show_shop() -> void:
+	_active_panel = "shop"
+
+	if settings_overlay:
+		settings_overlay.visible = true
+		settings_overlay.modulate.a = 0
+		var tween = settings_overlay.create_tween()
+		tween.tween_property(settings_overlay, "modulate:a", 1.0, 0.2)
+
+	if shop_panel:
+		shop_panel.show_panel()
+
+func _hide_shop() -> void:
+	if settings_overlay:
+		var tween = settings_overlay.create_tween()
+		tween.tween_property(settings_overlay, "modulate:a", 0.0, 0.15)
+		tween.tween_callback(func(): settings_overlay.visible = false)
+
+	if shop_panel:
+		shop_panel.hide_panel()
+
+	_active_panel = ""
+
+func _on_shop_closed() -> void:
+	_hide_shop()
+
+# Daily reward panel functions
+func _on_daily_reward_pressed() -> void:
+	AudioManager.play_button_click()
+
+	# Button animation
+	if daily_reward_button:
+		var tween = daily_reward_button.create_tween()
+		tween.tween_property(daily_reward_button, "scale", Vector2(0.9, 0.9), 0.05)
+		tween.tween_property(daily_reward_button, "scale", Vector2(1.05, 1.05), 0.1)
+		tween.tween_property(daily_reward_button, "scale", Vector2(1.0, 1.0), 0.05)
+
+	_show_daily_reward()
+
+func _show_daily_reward() -> void:
+	_active_panel = "daily_reward"
+
+	if settings_overlay:
+		settings_overlay.visible = true
+		settings_overlay.modulate.a = 0
+		var tween = settings_overlay.create_tween()
+		tween.tween_property(settings_overlay, "modulate:a", 1.0, 0.2)
+
+	if daily_reward_panel:
+		daily_reward_panel.show_panel()
+
+func _hide_daily_reward() -> void:
+	if settings_overlay:
+		var tween = settings_overlay.create_tween()
+		tween.tween_property(settings_overlay, "modulate:a", 0.0, 0.15)
+		tween.tween_callback(func(): settings_overlay.visible = false)
+
+	if daily_reward_panel:
+		daily_reward_panel.hide_panel()
+
+	_active_panel = ""
+
+func _on_daily_reward_closed() -> void:
+	_hide_daily_reward()
+
+func _hide_active_panel() -> void:
+	match _active_panel:
+		"settings":
+			_hide_settings()
+		"shop":
+			_hide_shop()
+		"daily_reward":
+			_hide_daily_reward()
+
+# Update daily button to show notification when reward available
+func _update_daily_button_notification() -> void:
+	if daily_reward_button:
+		if DailyRewardManager.is_reward_available():
+			# Show pulsing animation to indicate reward available
+			daily_reward_button.modulate = Color(1.0, 1.0, 0.5, 1.0)
+		else:
+			daily_reward_button.modulate = Color(1, 1, 1, 1)
+
+func _on_reward_available() -> void:
+	_update_daily_button_notification()
+
+func _on_reward_claimed(_day: int, _rewards: Dictionary) -> void:
+	_update_daily_button_notification()

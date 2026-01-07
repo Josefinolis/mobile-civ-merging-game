@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui_manager.gd" id="1_ui"]
 [ext_resource type="Script" path="res://scripts/game_grid.gd" id="2_grid"]
 [ext_resource type="Script" path="res://scripts/ui/quest_panel.gd" id="3_quest"]
 [ext_resource type="Script" path="res://scripts/ui/settings_panel.gd" id="4_settings"]
+[ext_resource type="Script" path="res://scripts/ui/shop_panel.gd" id="5_shop"]
+[ext_resource type="Script" path="res://scripts/ui/daily_reward_panel.gd" id="6_daily"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -144,14 +146,29 @@ grow_vertical = 0
 
 [node name="HBox" type="HBoxContainer" parent="BottomBar"]
 layout_mode = 2
+theme_override_constants/separation = 15
 alignment = 1
 
+[node name="DailyRewardButton" type="Button" parent="BottomBar/HBox"]
+custom_minimum_size = Vector2(70, 80)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+theme_override_font_sizes/font_size = 32
+text = "🎁"
+
 [node name="SpawnButton" type="Button" parent="BottomBar/HBox"]
-custom_minimum_size = Vector2(280, 80)
+custom_minimum_size = Vector2(220, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 28
 text = "BUILD NEW"
+
+[node name="ShopButton" type="Button" parent="BottomBar/HBox"]
+custom_minimum_size = Vector2(70, 80)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.69, 0.31, 1)
+theme_override_font_sizes/font_size = 32
+text = "🛒"
 
 [node name="QuestPanel" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(0, 50)
@@ -309,3 +326,146 @@ theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 16
 text = "Version 1.0.0"
 horizontal_alignment = 1
+
+[node name="ShopPanel" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(500, 550)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -275.0
+offset_right = 250.0
+offset_bottom = 275.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_shop")
+
+[node name="MarginContainer" type="MarginContainer" parent="ShopPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 15
+
+[node name="VBox" type="VBoxContainer" parent="ShopPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="ShopPanel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="ShopPanel/MarginContainer/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.3, 0.69, 0.31, 1)
+theme_override_font_sizes/font_size = 28
+text = "SHOP"
+
+[node name="CoinsLabel" type="Label" parent="ShopPanel/MarginContainer/VBox/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+theme_override_font_sizes/font_size = 20
+text = "0"
+
+[node name="CloseButton" type="Button" parent="ShopPanel/MarginContainer/VBox/Header"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 24
+text = "X"
+flat = true
+
+[node name="Separator" type="HSeparator" parent="ShopPanel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ShopPanel/MarginContainer/VBox"]
+custom_minimum_size = Vector2(0, 420)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="UpgradesContainer" type="VBoxContainer" parent="ShopPanel/MarginContainer/VBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="DailyRewardPanel" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(550, 400)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -275.0
+offset_top = -200.0
+offset_right = 275.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_daily")
+
+[node name="MarginContainer" type="MarginContainer" parent="DailyRewardPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 15
+
+[node name="VBox" type="VBoxContainer" parent="DailyRewardPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="DailyRewardPanel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="DailyRewardPanel/MarginContainer/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+theme_override_font_sizes/font_size = 28
+text = "DAILY REWARDS"
+
+[node name="CloseButton" type="Button" parent="DailyRewardPanel/MarginContainer/VBox/Header"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 24
+text = "X"
+flat = true
+
+[node name="Separator" type="HSeparator" parent="DailyRewardPanel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="StreakLabel" type="Label" parent="DailyRewardPanel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+text = "Total days: 0"
+horizontal_alignment = 1
+
+[node name="DaysContainer" type="GridContainer" parent="DailyRewardPanel/MarginContainer/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 7
+
+[node name="TimerLabel" type="Label" parent="DailyRewardPanel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 18
+text = "Next reward in: --"
+horizontal_alignment = 1
+
+[node name="ClaimButton" type="Button" parent="DailyRewardPanel/MarginContainer/VBox"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.12, 1)
+theme_override_font_sizes/font_size = 22
+text = "CLAIM"
