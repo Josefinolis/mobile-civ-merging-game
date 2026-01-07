@@ -6,7 +6,7 @@ El juego funciona correctamente en local y la APK se genera via GitHub Actions.
 
 ## Repositorio
 - **URL**: https://github.com/Josefinolis/mobile-civ-merging-game
-- **Última versión**: v1.1.0
+- **Última versión**: v1.1.1
 - **Release**: https://github.com/Josefinolis/mobile-civ-merging-game/releases
 
 ## Lo que está implementado
@@ -128,6 +128,7 @@ git tag v1.0.X && git push --tags
 | v1.0.3 | 2026-01-05 | Background music y settings menu |
 | v1.0.4 | 2026-01-05 | Docs update, persistencia audio/quests, bug fixes |
 | v1.1.0 | 2026-01-07 | Shop system con 6 upgrades, daily rewards de 7 días |
+| v1.1.1 | 2026-01-07 | Mejora visual: edificios detallados, fondo mejorado, celdas con estilo |
 
 ## Notas técnicas
 

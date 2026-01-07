@@ -25,15 +25,46 @@ func _ready() -> void:
 	_sync_with_game_manager()
 
 func _setup_grid() -> void:
-	# Create cell backgrounds
+	# Create cell backgrounds with improved visuals
 	for x in range(GameManager.grid_size.x):
 		for y in range(GameManager.grid_size.y):
+			var cell_pos = _grid_to_pixel(Vector2i(x, y))
+
+			# Cell shadow (offset)
+			var shadow = ColorRect.new()
+			shadow.custom_minimum_size = cell_size - Vector2(4, 4)
+			shadow.size = cell_size - Vector2(4, 4)
+			shadow.position = cell_pos + Vector2(6, 6)
+			shadow.color = Color(0, 0, 0, 0.25)
+			cells_container.add_child(shadow)
+
+			# Cell border/outline
+			var border = ColorRect.new()
+			border.custom_minimum_size = cell_size - Vector2(2, 2)
+			border.size = cell_size - Vector2(2, 2)
+			border.position = cell_pos + Vector2(1, 1)
+			border.color = Color(0.15, 0.18, 0.25, 0.9)
+			cells_container.add_child(border)
+
+			# Main cell background
 			var cell = ColorRect.new()
-			cell.custom_minimum_size = cell_size
-			cell.size = cell_size
-			cell.position = _grid_to_pixel(Vector2i(x, y))
-			cell.color = Color(0.2, 0.2, 0.2, 0.5)
+			cell.custom_minimum_size = cell_size - Vector2(6, 6)
+			cell.size = cell_size - Vector2(6, 6)
+			cell.position = cell_pos + Vector2(3, 3)
+			# Alternate colors for checkerboard pattern
+			if (x + y) % 2 == 0:
+				cell.color = Color(0.22, 0.26, 0.32, 0.85)
+			else:
+				cell.color = Color(0.18, 0.22, 0.28, 0.85)
 			cells_container.add_child(cell)
+
+			# Inner highlight (top-left shine)
+			var shine = ColorRect.new()
+			shine.custom_minimum_size = Vector2(cell_size.x - 12, 3)
+			shine.size = Vector2(cell_size.x - 12, 3)
+			shine.position = cell_pos + Vector2(6, 5)
+			shine.color = Color(1, 1, 1, 0.08)
+			cells_container.add_child(shine)
 
 func _create_buildings() -> void:
 	buildings.clear()
