@@ -129,6 +129,7 @@ git tag v1.0.X && git push --tags
 | v1.0.4 | 2026-01-05 | Docs update, persistencia audio/quests, bug fixes |
 | v1.1.0 | 2026-01-07 | Shop system con 6 upgrades, daily rewards de 7 días |
 | v1.1.1 | 2026-01-07 | Mejora visual: edificios detallados, fondo mejorado, celdas con estilo |
+| v1.1.2 | 2026-01-07 | Edificios centrados y escalados, UI con estilos mejorados |
 
 ## Notas técnicas
 

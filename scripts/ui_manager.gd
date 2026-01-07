@@ -3,22 +3,32 @@ class_name UIManager
 ## UIManager - Handles all UI updates and user interactions
 
 @onready var coins_label: Label = $TopBar/HBox/CoinsContainer/CoinsLabel
+@onready var coins_title: Label = $TopBar/HBox/CoinsContainer/CoinsTitle
 @onready var energy_label: Label = $TopBar/HBox/EnergyContainer/EnergyLabel
+@onready var energy_title: Label = $TopBar/HBox/EnergyContainer/EnergyTitle
 @onready var income_label: Label = $TopBar/HBox/IncomeContainer/IncomeLabel
+@onready var income_title: Label = $TopBar/HBox/IncomeContainer/IncomeTitle
 @onready var spawn_button: Button = $BottomBar/HBox/SpawnButton
 @onready var shop_button: Button = $BottomBar/HBox/ShopButton
 @onready var daily_reward_button: Button = $BottomBar/HBox/DailyRewardButton
 @onready var settings_button: Button = $TopBar/HBox/SettingsButton
+@onready var top_bar: PanelContainer = $TopBar
+@onready var bottom_bar: PanelContainer = $BottomBar
 @onready var game_grid = $GridContainer/GameGrid
 @onready var settings_panel = $SettingsPanel
 @onready var shop_panel = $ShopPanel
 @onready var daily_reward_panel = $DailyRewardPanel
 @onready var settings_overlay: ColorRect = $SettingsOverlay
+@onready var quest_panel: PanelContainer = $QuestPanel
 
 var _coins_display: float = 0.0
 var _active_panel: String = ""  # Track which panel is open
+var _time: float = 0.0
 
 func _ready() -> void:
+	# Enhance UI with visual effects
+	_enhance_ui()
+
 	# Connect signals
 	GameManager.coins_changed.connect(_on_coins_changed)
 	GameManager.energy_changed.connect(_on_energy_changed)
@@ -55,9 +65,83 @@ func _ready() -> void:
 	DailyRewardManager.reward_available.connect(_on_reward_available)
 	DailyRewardManager.reward_claimed.connect(_on_reward_claimed)
 
+	# Connect shop signals to update UI when upgrades are purchased
+	ShopManager.upgrade_purchased.connect(_on_upgrade_purchased)
+
 	# Initial UI update
 	_update_ui()
 	_update_daily_button_notification()
+
+func _enhance_ui() -> void:
+	# Create stylish bar backgrounds
+	_style_panel(top_bar, Color(0.1, 0.12, 0.18, 0.95), Color(0.2, 0.25, 0.35, 0.5))
+	_style_panel(bottom_bar, Color(0.1, 0.12, 0.18, 0.95), Color(0.2, 0.25, 0.35, 0.5))
+
+	# Add icons to stat labels
+	if coins_title:
+		coins_title.text = "COINS"
+	if energy_title:
+		energy_title.text = "ENERGY"
+	if income_title:
+		income_title.text = "INCOME"
+
+	# Style buttons with gradients
+	_style_button(spawn_button, Color(0.2, 0.5, 0.9), Color(0.15, 0.4, 0.8))
+	_style_button(shop_button, Color(0.2, 0.6, 0.3), Color(0.15, 0.5, 0.25))
+	_style_button(daily_reward_button, Color(0.8, 0.6, 0.2), Color(0.7, 0.5, 0.15))
+
+	# Style panels
+	_style_panel(settings_panel, Color(0.12, 0.14, 0.2, 0.98), Color(0.3, 0.35, 0.5, 0.3))
+	_style_panel(shop_panel, Color(0.12, 0.14, 0.2, 0.98), Color(0.2, 0.4, 0.3, 0.3))
+	_style_panel(daily_reward_panel, Color(0.12, 0.14, 0.2, 0.98), Color(0.4, 0.35, 0.2, 0.3))
+	_style_panel(quest_panel, Color(0.1, 0.12, 0.18, 0.95), Color(0.5, 0.45, 0.2, 0.4))
+
+func _style_panel(panel: PanelContainer, bg_color: Color, border_color: Color) -> void:
+	if not panel:
+		return
+	var style = StyleBoxFlat.new()
+	style.bg_color = bg_color
+	style.border_color = border_color
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(12)
+	style.shadow_color = Color(0, 0, 0, 0.4)
+	style.shadow_size = 8
+	style.shadow_offset = Vector2(0, 4)
+	panel.add_theme_stylebox_override("panel", style)
+
+func _style_button(button: Button, color1: Color, color2: Color) -> void:
+	if not button:
+		return
+	# Normal style
+	var normal = StyleBoxFlat.new()
+	normal.bg_color = color1
+	normal.set_corner_radius_all(10)
+	normal.shadow_color = Color(0, 0, 0, 0.3)
+	normal.shadow_size = 4
+	normal.shadow_offset = Vector2(0, 2)
+	normal.border_color = color1.lightened(0.3)
+	normal.set_border_width_all(1)
+	button.add_theme_stylebox_override("normal", normal)
+
+	# Hover style
+	var hover = StyleBoxFlat.new()
+	hover.bg_color = color1.lightened(0.15)
+	hover.set_corner_radius_all(10)
+	hover.border_color = color1.lightened(0.4)
+	hover.set_border_width_all(2)
+	button.add_theme_stylebox_override("hover", hover)
+
+	# Pressed style
+	var pressed = StyleBoxFlat.new()
+	pressed.bg_color = color2
+	pressed.set_corner_radius_all(10)
+	button.add_theme_stylebox_override("pressed", pressed)
+
+	# Disabled style
+	var disabled = StyleBoxFlat.new()
+	disabled.bg_color = Color(0.3, 0.3, 0.3, 0.8)
+	disabled.set_corner_radius_all(10)
+	button.add_theme_stylebox_override("disabled", disabled)
 
 func _process(delta: float) -> void:
 	# Smooth coin counter animation
@@ -293,3 +377,9 @@ func _on_reward_available() -> void:
 
 func _on_reward_claimed(_day: int, _rewards: Dictionary) -> void:
 	_update_daily_button_notification()
+	_update_ui()  # Update energy display after claiming rewards
+
+func _on_upgrade_purchased(upgrade_id: String, _new_level: int) -> void:
+	# Update UI when upgrades that affect display are purchased
+	if upgrade_id == "energy_capacity" or upgrade_id == "energy_regen":
+		_update_ui()  # Refresh energy display with new max
