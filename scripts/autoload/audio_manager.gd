@@ -52,6 +52,7 @@ func _pregenerate_sounds() -> void:
 	_cached_sounds["error"] = _generate_error_sound()
 	_cached_sounds["coin"] = _generate_coin_sound()
 	_cached_sounds["quest_complete"] = _generate_quest_complete_sound()
+	_cached_sounds["achievement"] = _generate_achievement_sound()
 	_cached_music = _generate_ambient_music()
 
 func _get_available_player() -> AudioStreamPlayer:
@@ -138,6 +139,14 @@ func play_quest_complete() -> void:
 	var player = _get_available_player()
 	player.stream = _cached_sounds["quest_complete"]
 	player.volume_db = linear_to_db(sfx_volume)
+	player.play()
+
+func play_achievement() -> void:
+	if not master_enabled or not sfx_enabled:
+		return
+	var player = _get_available_player()
+	player.stream = _cached_sounds["achievement"]
+	player.volume_db = linear_to_db(sfx_volume * 1.2)
 	player.play()
 
 # === IMPROVED SOUND GENERATION ===
@@ -501,6 +510,77 @@ func _generate_quest_complete_sound() -> AudioStreamWAV:
 			master_env = 1.0 - (overall_progress - 0.75) / 0.25
 
 		sample = sample * master_env * 0.4
+		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
+
+	audio.data = data
+	return audio
+
+func _generate_achievement_sound() -> AudioStreamWAV:
+	# Epic celebratory fanfare - longer and more dramatic
+	var sample_rate = 44100
+	var note_duration = 0.15
+	# Dramatic ascending pattern with final chord
+	var frequencies = [
+		[392.00],  # G4 (dramatic start)
+		[493.88],  # B4
+		[587.33],  # D5
+		[783.99],  # G5
+		[783.99, 987.77, 1174.66],  # G5 major chord finale
+	]
+	var total_duration = note_duration * 4 + 0.5  # Extra time for final chord
+	var samples = int(total_duration * sample_rate)
+
+	var audio = AudioStreamWAV.new()
+	audio.mix_rate = sample_rate
+	audio.format = AudioStreamWAV.FORMAT_8_BITS
+	audio.stereo = false
+
+	var data = PackedByteArray()
+	data.resize(samples)
+
+	for i in range(samples):
+		var t = float(i) / sample_rate
+		var overall_progress = float(i) / samples
+
+		var sample = 0.0
+
+		for note_idx in range(frequencies.size()):
+			var note_start = note_idx * note_duration
+			var is_final = note_idx == frequencies.size() - 1
+			var this_duration = note_duration * 3.0 if is_final else note_duration * 1.8
+			var note_end = note_start + this_duration
+
+			if t >= note_start and t < note_end:
+				var note_t = t - note_start
+				var note_progress = note_t / this_duration
+				var chord = frequencies[note_idx]
+
+				for freq in chord:
+					# Rich harmonics for epic sound
+					var note_sample = sin(note_t * freq * TAU) * 0.35
+					note_sample += sin(note_t * freq * 2 * TAU) * 0.2
+					note_sample += sin(note_t * freq * 3 * TAU) * 0.1
+					note_sample += sin(note_t * freq * 4 * TAU) * 0.05
+
+					# Per-note envelope
+					var note_env = 1.0
+					if note_progress < 0.05:
+						note_env = note_progress / 0.05
+					elif is_final:
+						# Final chord sustains longer
+						if note_progress > 0.7:
+							note_env = pow(1.0 - (note_progress - 0.7) / 0.3, 1.5)
+					else:
+						note_env = pow(1.0 - (note_progress - 0.05) / 0.95, 1.2)
+
+					sample += note_sample * note_env / chord.size()
+
+		# Overall envelope
+		var master_env = 1.0
+		if overall_progress > 0.85:
+			master_env = 1.0 - (overall_progress - 0.85) / 0.15
+
+		sample = sample * master_env * 0.5
 		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
 
 	audio.data = data

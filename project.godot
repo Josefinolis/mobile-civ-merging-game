@@ -25,6 +25,7 @@ SaveManager="*res://scripts/autoload/save_manager.gd"
 QuestManager="*res://scripts/autoload/quest_manager.gd"
 ParticleEffects="*res://scripts/effects/particle_effects.gd"
 AudioManager="*res://scripts/autoload/audio_manager.gd"
+IAPManager="*res://scripts/autoload/iap_manager.gd"
 
 [display]
 

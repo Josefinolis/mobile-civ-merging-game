@@ -161,6 +161,10 @@ func _activate_coin_bonus(multiplier: float, duration: float) -> void:
 	_coin_bonus_multiplier = multiplier
 	_coin_bonus_timer = duration
 
+# Public version for external use (like IAP)
+func activate_coin_bonus(duration: float, multiplier: float = 2.0) -> void:
+	_activate_coin_bonus(multiplier, duration)
+
 func get_active_coin_bonus() -> float:
 	if _coin_bonus_active:
 		return _coin_bonus_multiplier

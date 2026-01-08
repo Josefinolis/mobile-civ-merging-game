@@ -11,6 +11,7 @@ class_name UIManager
 @onready var spawn_button: Button = $BottomBar/HBox/SpawnButton
 @onready var shop_button: Button = $BottomBar/HBox/ShopButton
 @onready var daily_reward_button: Button = $BottomBar/HBox/DailyRewardButton
+@onready var iap_button: Button = $BottomBar/HBox/IAPButton
 @onready var settings_button: Button = $TopBar/HBox/SettingsButton
 @onready var top_bar: PanelContainer = $TopBar
 @onready var bottom_bar: PanelContainer = $BottomBar
@@ -18,6 +19,7 @@ class_name UIManager
 @onready var settings_panel = $SettingsPanel
 @onready var shop_panel = $ShopPanel
 @onready var daily_reward_panel = $DailyRewardPanel
+@onready var iap_panel = $IAPPanel
 @onready var settings_overlay: ColorRect = $SettingsOverlay
 @onready var quest_panel: PanelContainer = $QuestPanel
 
@@ -55,6 +57,12 @@ func _ready() -> void:
 	if daily_reward_panel:
 		daily_reward_panel.closed.connect(_on_daily_reward_closed)
 
+	if iap_button:
+		iap_button.pressed.connect(_on_iap_pressed)
+
+	if iap_panel:
+		iap_panel.closed.connect(_on_iap_closed)
+
 	if settings_overlay:
 		settings_overlay.gui_input.connect(_on_overlay_input)
 
@@ -89,11 +97,13 @@ func _enhance_ui() -> void:
 	_style_button(spawn_button, Color(0.2, 0.5, 0.9), Color(0.15, 0.4, 0.8))
 	_style_button(shop_button, Color(0.2, 0.6, 0.3), Color(0.15, 0.5, 0.25))
 	_style_button(daily_reward_button, Color(0.8, 0.6, 0.2), Color(0.7, 0.5, 0.15))
+	_style_button(iap_button, Color(0.9, 0.5, 0.15), Color(0.8, 0.4, 0.1))
 
 	# Style panels
 	_style_panel(settings_panel, Color(0.12, 0.14, 0.2, 0.98), Color(0.3, 0.35, 0.5, 0.3))
 	_style_panel(shop_panel, Color(0.12, 0.14, 0.2, 0.98), Color(0.2, 0.4, 0.3, 0.3))
 	_style_panel(daily_reward_panel, Color(0.12, 0.14, 0.2, 0.98), Color(0.4, 0.35, 0.2, 0.3))
+	_style_panel(iap_panel, Color(0.12, 0.14, 0.2, 0.98), Color(0.5, 0.35, 0.15, 0.4))
 	_style_panel(quest_panel, Color(0.1, 0.12, 0.18, 0.95), Color(0.5, 0.45, 0.2, 0.4))
 
 func _style_panel(panel: PanelContainer, bg_color: Color, border_color: Color) -> void:
@@ -197,7 +207,10 @@ func _on_building_unlocked(level: int) -> void:
 	var data = GameManager.building_data.get(level, {})
 	var building_name = data.get("name", "Building")
 	print("New building unlocked: ", building_name)
-	# Could show a popup here
+
+	# Show achievement popup for levels 7+
+	if level >= 7:
+		_show_achievement_popup(level, building_name, data.get("color", Color.WHITE))
 
 func _on_spawn_pressed() -> void:
 	if game_grid:
@@ -354,6 +367,45 @@ func _hide_daily_reward() -> void:
 func _on_daily_reward_closed() -> void:
 	_hide_daily_reward()
 
+# IAP panel functions
+func _on_iap_pressed() -> void:
+	AudioManager.play_button_click()
+
+	# Button animation
+	if iap_button:
+		var tween = iap_button.create_tween()
+		tween.tween_property(iap_button, "scale", Vector2(0.9, 0.9), 0.05)
+		tween.tween_property(iap_button, "scale", Vector2(1.05, 1.05), 0.1)
+		tween.tween_property(iap_button, "scale", Vector2(1.0, 1.0), 0.05)
+
+	_show_iap()
+
+func _show_iap() -> void:
+	_active_panel = "iap"
+
+	if settings_overlay:
+		settings_overlay.visible = true
+		settings_overlay.modulate.a = 0
+		var tween = settings_overlay.create_tween()
+		tween.tween_property(settings_overlay, "modulate:a", 1.0, 0.2)
+
+	if iap_panel:
+		iap_panel.show_panel()
+
+func _hide_iap() -> void:
+	if settings_overlay:
+		var tween = settings_overlay.create_tween()
+		tween.tween_property(settings_overlay, "modulate:a", 0.0, 0.15)
+		tween.tween_callback(func(): settings_overlay.visible = false)
+
+	if iap_panel:
+		iap_panel.hide_panel()
+
+	_active_panel = ""
+
+func _on_iap_closed() -> void:
+	_hide_iap()
+
 func _hide_active_panel() -> void:
 	match _active_panel:
 		"settings":
@@ -362,6 +414,8 @@ func _hide_active_panel() -> void:
 			_hide_shop()
 		"daily_reward":
 			_hide_daily_reward()
+		"iap":
+			_hide_iap()
 
 # Update daily button to show notification when reward available
 func _update_daily_button_notification() -> void:
@@ -383,3 +437,90 @@ func _on_upgrade_purchased(upgrade_id: String, _new_level: int) -> void:
 	# Update UI when upgrades that affect display are purchased
 	if upgrade_id == "energy_capacity" or upgrade_id == "energy_regen":
 		_update_ui()  # Refresh energy display with new max
+
+# Achievement popup for first building milestones (level 7+)
+func _show_achievement_popup(level: int, building_name: String, building_color: Color) -> void:
+	# Play achievement sound
+	AudioManager.play_achievement()
+
+	# Create overlay
+	var overlay = ColorRect.new()
+	overlay.color = Color(0, 0, 0, 0)
+	overlay.anchor_right = 1.0
+	overlay.anchor_bottom = 1.0
+	overlay.z_index = 500
+	add_child(overlay)
+
+	# Fade in overlay
+	var overlay_tween = overlay.create_tween()
+	overlay_tween.tween_property(overlay, "color:a", 0.7, 0.3)
+
+	# Create container for text
+	var container = VBoxContainer.new()
+	container.anchor_left = 0.5
+	container.anchor_right = 0.5
+	container.anchor_top = 0.5
+	container.anchor_bottom = 0.5
+	container.offset_left = -300
+	container.offset_right = 300
+	container.offset_top = -150
+	container.offset_bottom = 150
+	container.alignment = BoxContainer.ALIGNMENT_CENTER
+	container.z_index = 501
+	add_child(container)
+
+	# "NEW BUILDING!" title
+	var title = Label.new()
+	title.text = "NEW BUILDING!"
+	title.add_theme_font_size_override("font_size", 48)
+	title.add_theme_color_override("font_color", Color.GOLD)
+	title.add_theme_constant_override("outline_size", 4)
+	title.add_theme_color_override("font_outline_color", Color.BLACK)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	container.add_child(title)
+
+	# Building name
+	var name_label = Label.new()
+	name_label.text = building_name.to_upper()
+	name_label.add_theme_font_size_override("font_size", 64)
+	name_label.add_theme_color_override("font_color", building_color)
+	name_label.add_theme_constant_override("outline_size", 5)
+	name_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	container.add_child(name_label)
+
+	# Level indicator
+	var level_label = Label.new()
+	level_label.text = "Level %d" % level
+	level_label.add_theme_font_size_override("font_size", 32)
+	level_label.add_theme_color_override("font_color", Color.WHITE)
+	level_label.add_theme_constant_override("outline_size", 3)
+	level_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	container.add_child(level_label)
+
+	# Start animation - scale up from 0
+	container.scale = Vector2(0, 0)
+	container.pivot_offset = container.size / 2
+
+	var tween = container.create_tween()
+	tween.tween_property(container, "scale", Vector2(1.2, 1.2), 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tween.tween_property(container, "scale", Vector2(1.0, 1.0), 0.15)
+
+	# Pulse animation on the name
+	var name_tween = name_label.create_tween().set_loops(3)
+	name_tween.tween_property(name_label, "modulate", Color(1.5, 1.5, 1.5, 1), 0.2)
+	name_tween.tween_property(name_label, "modulate", Color(1, 1, 1, 1), 0.2)
+
+	# Auto-dismiss after 2.5 seconds
+	await get_tree().create_timer(2.5).timeout
+
+	# Fade out
+	var fade_tween = create_tween()
+	fade_tween.tween_property(overlay, "color:a", 0.0, 0.3)
+	fade_tween.parallel().tween_property(container, "modulate:a", 0.0, 0.3)
+	fade_tween.parallel().tween_property(container, "scale", Vector2(0.8, 0.8), 0.3)
+
+	await fade_tween.finished
+	overlay.queue_free()
+	container.queue_free()

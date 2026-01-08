@@ -6,7 +6,7 @@ signal merge_completed(new_level: int)
 
 const BUILDING_SCENE_PATH = "res://scenes/building.tscn"
 
-@export var cell_size: Vector2 = Vector2(160, 170)
+@export var cell_size: Vector2 = Vector2(132, 138)
 @export var cell_padding: Vector2 = Vector2(8, 8)
 
 var building_scene: PackedScene

@@ -34,8 +34,8 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
-	# Animate glow for high-level buildings
-	if glow_effect and building_level >= 9:
+	# Animate glow for high-level buildings (level 11+)
+	if glow_effect and building_level >= 11:
 		var pulse = 0.15 + sin(_time * 2.0) * 0.05
 		glow_effect.color.a = pulse
 
@@ -73,13 +73,17 @@ func _build_visual() -> void:
 		1: _build_tent_detailed(base_color)
 		2: _build_hut_detailed(base_color)
 		3: _build_cabin_detailed(base_color)
-		4: _build_house_detailed(base_color)
-		5: _build_villa_detailed(base_color)
-		6: _build_mansion_detailed(base_color)
-		7: _build_tower_detailed(base_color)
-		8: _build_skyscraper_detailed(base_color)
-		9: _build_monument_detailed(base_color)
-		10: _build_wonder_detailed(base_color)
+		4: _build_cottage_detailed(base_color)
+		5: _build_house_detailed(base_color)
+		6: _build_villa_detailed(base_color)
+		7: _build_mansion_detailed(base_color)
+		8: _build_tower_detailed(base_color)
+		9: _build_skyscraper_detailed(base_color)
+		10: _build_castle_detailed(base_color)
+		11: _build_palace_detailed(base_color)
+		12: _build_citadel_detailed(base_color)
+		13: _build_monument_detailed(base_color)
+		14: _build_wonder_detailed(base_color)
 
 	_update_labels(building_name, coins_per_sec)
 	_update_badge()
@@ -309,7 +313,78 @@ func _build_cabin_detailed(base_color: Color) -> void:
 func _create_cabin_window(pos: Vector2, base_color: Color) -> void:
 	pass  # Implemented inline above
 
-# ==================== NIVEL 4: HOUSE ====================
+# ==================== NIVEL 4: COTTAGE ====================
+func _build_cottage_detailed(base_color: Color) -> void:
+	# Garden/grass
+	_rect(Vector2(0, 88), Vector2(100, 12), Color(0.35, 0.55, 0.3))
+	_rect(Vector2(5, 90), Vector2(30, 6), Color(0.4, 0.6, 0.35))
+
+	# Building shadow
+	_rect(Vector2(12, 82), Vector2(76, 8), Color(0, 0, 0, 0.2))
+
+	# Stone foundation
+	_rect(Vector2(10, 78), Vector2(80, 10), Color(0.5, 0.5, 0.5))
+	_rect(Vector2(12, 80), Vector2(76, 6), Color(0.55, 0.55, 0.55))
+
+	# Main cottage body
+	_rect(Vector2(12, 35), Vector2(76, 48), base_color)
+	_rect(Vector2(14, 37), Vector2(72, 44), base_color.lightened(0.05))
+
+	# Wall texture - stone pattern
+	for i in range(6):
+		_rect(Vector2(12, 38 + i * 7), Vector2(76, 2), base_color.darkened(0.1))
+
+	# Roof - thatched style
+	_rect(Vector2(5, 18), Vector2(45, 22), base_color.darkened(0.3))
+	_rect(Vector2(50, 18), Vector2(45, 22), base_color.darkened(0.35))
+	_rect(Vector2(8, 20), Vector2(40, 18), base_color.darkened(0.25))
+	_rect(Vector2(52, 20), Vector2(40, 18), base_color.darkened(0.3))
+
+	# Roof peak
+	_rect(Vector2(42, 10), Vector2(16, 12), base_color.darkened(0.3))
+
+	# Chimney
+	_rect(Vector2(70, 5), Vector2(14, 18), Color(0.55, 0.4, 0.35))
+	_rect(Vector2(68, 2), Vector2(18, 5), Color(0.5, 0.35, 0.3))
+
+	# Smoke puffs
+	_rect(Vector2(73, -5), Vector2(6, 6), Color(0.8, 0.8, 0.8, 0.35))
+	_rect(Vector2(75, -10), Vector2(5, 5), Color(0.85, 0.85, 0.85, 0.25))
+
+	# Front door
+	_rect(Vector2(40, 50), Vector2(20, 33), Color(0.3, 0.22, 0.15))
+	_rect(Vector2(42, 52), Vector2(16, 29), Color(0.4, 0.3, 0.2))
+	_rect(Vector2(42, 52), Vector2(7, 29), Color(0.38, 0.28, 0.18))
+	_rect(Vector2(51, 52), Vector2(7, 29), Color(0.42, 0.32, 0.22))
+
+	# Door handle
+	_rect(Vector2(55, 66), Vector2(3, 5), Color(0.6, 0.5, 0.25))
+
+	# Left window
+	_rect(Vector2(18, 48), Vector2(16, 20), Color(0.25, 0.18, 0.12))
+	_rect(Vector2(20, 50), Vector2(12, 16), Color(0.85, 0.9, 0.95, 0.85))
+	_rect(Vector2(25, 50), Vector2(2, 16), Color(0.3, 0.22, 0.15))
+	_rect(Vector2(20, 57), Vector2(12, 2), Color(0.3, 0.22, 0.15))
+
+	# Right window
+	_rect(Vector2(66, 48), Vector2(16, 20), Color(0.25, 0.18, 0.12))
+	_rect(Vector2(68, 50), Vector2(12, 16), Color(0.85, 0.9, 0.95, 0.85))
+	_rect(Vector2(73, 50), Vector2(2, 16), Color(0.3, 0.22, 0.15))
+	_rect(Vector2(68, 57), Vector2(12, 2), Color(0.3, 0.22, 0.15))
+
+	# Window boxes with flowers
+	_rect(Vector2(18, 68), Vector2(16, 4), Color(0.45, 0.3, 0.2))
+	_rect(Vector2(20, 65), Vector2(4, 5), Color(0.9, 0.3, 0.4))
+	_rect(Vector2(26, 64), Vector2(4, 6), Color(0.95, 0.8, 0.2))
+	_rect(Vector2(66, 68), Vector2(16, 4), Color(0.45, 0.3, 0.2))
+	_rect(Vector2(68, 65), Vector2(4, 5), Color(0.4, 0.3, 0.9))
+	_rect(Vector2(74, 64), Vector2(4, 6), Color(0.9, 0.4, 0.5))
+
+	# Garden fence
+	_rect(Vector2(2, 82), Vector2(8, 10), Color(0.55, 0.4, 0.3))
+	_rect(Vector2(90, 82), Vector2(8, 10), Color(0.55, 0.4, 0.3))
+
+# ==================== NIVEL 5: HOUSE ====================
 func _build_house_detailed(base_color: Color) -> void:
 	# Lawn
 	_rect(Vector2(0, 88), Vector2(100, 12), Color(0.3, 0.5, 0.25))
@@ -719,7 +794,199 @@ func _build_skyscraper_detailed(base_color: Color) -> void:
 	_rect(Vector2(40, 3), Vector2(20, 4), Color(0.4, 0.4, 0.45))
 	_rect(Vector2(48, 4), Vector2(4, 2), Color(0.95, 0.95, 0.3))
 
-# ==================== NIVEL 9: MONUMENT ====================
+# ==================== NIVEL 10: CASTLE ====================
+func _build_castle_detailed(base_color: Color) -> void:
+	# Castle grounds
+	_rect(Vector2(0, 88), Vector2(100, 12), Color(0.35, 0.45, 0.35))
+	_rect(Vector2(5, 90), Vector2(90, 8), Color(0.4, 0.5, 0.4))
+
+	# Building shadow
+	_rect(Vector2(8, 82), Vector2(84, 10), Color(0, 0, 0, 0.25))
+
+	# Main castle wall
+	_rect(Vector2(15, 30), Vector2(70, 60), base_color)
+	_rect(Vector2(17, 32), Vector2(66, 56), base_color.lightened(0.05))
+
+	# Stone texture
+	for i in range(8):
+		for j in range(6):
+			if (i + j) % 2 == 0:
+				_rect(Vector2(18 + j * 11, 34 + i * 7), Vector2(10, 6), base_color.darkened(0.08))
+
+	# Left tower
+	_rect(Vector2(5, 15), Vector2(24, 75), base_color.darkened(0.05))
+	_rect(Vector2(7, 17), Vector2(20, 71), base_color)
+	# Tower top (crenellations)
+	for i in range(4):
+		_rect(Vector2(7 + i * 6, 8), Vector2(4, 10), base_color.darkened(0.1))
+
+	# Right tower
+	_rect(Vector2(71, 15), Vector2(24, 75), base_color.darkened(0.05))
+	_rect(Vector2(73, 17), Vector2(20, 71), base_color)
+	# Tower top (crenellations)
+	for i in range(4):
+		_rect(Vector2(73 + i * 6, 8), Vector2(4, 10), base_color.darkened(0.1))
+
+	# Center tower (keep)
+	_rect(Vector2(35, 5), Vector2(30, 30), base_color.lightened(0.08))
+	_rect(Vector2(37, 7), Vector2(26, 26), base_color.lightened(0.12))
+	# Keep crenellations
+	for i in range(5):
+		_rect(Vector2(37 + i * 6, -2), Vector2(4, 9), base_color)
+
+	# Keep windows
+	_rect(Vector2(42, 12), Vector2(6, 10), Color(0.15, 0.12, 0.1))
+	_rect(Vector2(52, 12), Vector2(6, 10), Color(0.15, 0.12, 0.1))
+
+	# Main gate with portcullis
+	_rect(Vector2(38, 50), Vector2(24, 40), Color(0.2, 0.15, 0.1))
+	_rect(Vector2(40, 45), Vector2(20, 8), base_color.lightened(0.1))
+	_rect(Vector2(40, 52), Vector2(20, 36), Color(0.15, 0.1, 0.08))
+	# Portcullis bars
+	for i in range(4):
+		_rect(Vector2(42 + i * 5, 52), Vector2(2, 36), Color(0.3, 0.3, 0.32))
+
+	# Tower windows
+	_rect(Vector2(12, 35), Vector2(10, 14), Color(0.15, 0.12, 0.1))
+	_rect(Vector2(12, 55), Vector2(10, 14), Color(0.15, 0.12, 0.1))
+	_rect(Vector2(78, 35), Vector2(10, 14), Color(0.15, 0.12, 0.1))
+	_rect(Vector2(78, 55), Vector2(10, 14), Color(0.15, 0.12, 0.1))
+
+	# Flags on towers
+	_rect(Vector2(15, -5), Vector2(3, 15), Color(0.4, 0.35, 0.3))
+	_rect(Vector2(18, -5), Vector2(10, 7), Color(0.9, 0.2, 0.2))
+	_rect(Vector2(82, -5), Vector2(3, 15), Color(0.4, 0.35, 0.3))
+	_rect(Vector2(85, -5), Vector2(10, 7), Color(0.2, 0.2, 0.9))
+
+# ==================== NIVEL 11: PALACE ====================
+func _build_palace_detailed(base_color: Color) -> void:
+	# Palace gardens
+	_rect(Vector2(0, 88), Vector2(100, 12), Color(0.3, 0.55, 0.35))
+	_rect(Vector2(10, 90), Vector2(80, 8), Color(0.75, 0.7, 0.6))
+
+	# Fountain base in center
+	_rect(Vector2(42, 92), Vector2(16, 6), Color(0.65, 0.65, 0.68))
+	_rect(Vector2(46, 88), Vector2(8, 6), Color(0.5, 0.7, 0.85, 0.7))
+
+	# Building shadow
+	_rect(Vector2(5, 82), Vector2(92, 10), Color(0, 0, 0, 0.22))
+
+	# Main palace body
+	_rect(Vector2(8, 28), Vector2(84, 60), base_color)
+	_rect(Vector2(10, 30), Vector2(80, 56), base_color.lightened(0.06))
+
+	# Palace wings
+	_rect(Vector2(0, 38), Vector2(12, 52), base_color.darkened(0.05))
+	_rect(Vector2(88, 38), Vector2(12, 52), base_color.darkened(0.05))
+
+	# Ornate windows - main floor
+	for i in range(5):
+		_rect(Vector2(14 + i * 16, 45), Vector2(12, 18), Color(0.95, 0.93, 0.88))
+		_rect(Vector2(16 + i * 16, 47), Vector2(8, 14), Color(0.7, 0.85, 0.95))
+		_rect(Vector2(16 + i * 16, 43), Vector2(8, 4), base_color.lightened(0.15))
+
+	# Grand entrance
+	_rect(Vector2(35, 55), Vector2(30, 35), Color(0.98, 0.96, 0.92))
+	_rect(Vector2(37, 50), Vector2(26, 8), Color(0.95, 0.93, 0.88))
+	_rect(Vector2(40, 60), Vector2(20, 28), Color(0.25, 0.18, 0.12))
+	_rect(Vector2(42, 62), Vector2(7, 24), Color(0.35, 0.25, 0.18))
+	_rect(Vector2(51, 62), Vector2(7, 24), Color(0.33, 0.23, 0.16))
+
+	# Grand columns
+	_rect(Vector2(35, 50), Vector2(5, 40), Color(0.95, 0.93, 0.88))
+	_rect(Vector2(60, 50), Vector2(5, 40), Color(0.95, 0.93, 0.88))
+
+	# Roof with dome
+	_rect(Vector2(5, 18), Vector2(90, 14), base_color.darkened(0.2))
+	_rect(Vector2(7, 20), Vector2(86, 10), base_color.darkened(0.15))
+
+	# Central dome
+	_rect(Vector2(35, 5), Vector2(30, 16), base_color.lightened(0.1))
+	_rect(Vector2(38, 8), Vector2(24, 12), base_color.lightened(0.15))
+	_rect(Vector2(42, 2), Vector2(16, 8), base_color.lightened(0.18))
+	_rect(Vector2(46, -2), Vector2(8, 6), base_color.lightened(0.2))
+
+	# Dome finial
+	_rect(Vector2(48, -8), Vector2(4, 8), Color(0.9, 0.8, 0.3))
+	_rect(Vector2(49, -10), Vector2(2, 3), Color(0.95, 0.85, 0.35))
+
+	# Decorative balustrade
+	_rect(Vector2(5, 16), Vector2(90, 4), Color(0.92, 0.9, 0.85))
+	for i in range(18):
+		_rect(Vector2(8 + i * 5, 16), Vector2(2, 4), Color(0.88, 0.86, 0.8))
+
+	# Wing roofs
+	_rect(Vector2(-2, 32), Vector2(14, 8), base_color.darkened(0.25))
+	_rect(Vector2(88, 32), Vector2(14, 8), base_color.darkened(0.25))
+
+	# Glow effect
+	_add_glow(Color(0.7, 0.85, 0.95), 0.25)
+
+# ==================== NIVEL 12: CITADEL ====================
+func _build_citadel_detailed(base_color: Color) -> void:
+	# Volcanic/dramatic ground
+	_rect(Vector2(0, 88), Vector2(100, 12), Color(0.3, 0.25, 0.25))
+	_rect(Vector2(5, 90), Vector2(90, 8), Color(0.35, 0.3, 0.3))
+
+	# Lava glow at base
+	_rect(Vector2(10, 92), Vector2(80, 6), Color(0.95, 0.4, 0.15, 0.4))
+
+	# Building shadow
+	_rect(Vector2(10, 82), Vector2(80, 10), Color(0, 0, 0, 0.3))
+
+	# Massive fortress base
+	_rect(Vector2(5, 40), Vector2(90, 50), base_color)
+	_rect(Vector2(7, 42), Vector2(86, 46), base_color.lightened(0.05))
+
+	# Fortified walls with angular design
+	_rect(Vector2(0, 35), Vector2(15, 55), base_color.darkened(0.1))
+	_rect(Vector2(85, 35), Vector2(15, 55), base_color.darkened(0.1))
+
+	# Central tower - imposing
+	_rect(Vector2(30, 8), Vector2(40, 40), base_color.lightened(0.08))
+	_rect(Vector2(32, 10), Vector2(36, 36), base_color.lightened(0.12))
+
+	# Tower crown with spikes
+	_rect(Vector2(28, 2), Vector2(44, 10), base_color.darkened(0.15))
+	_rect(Vector2(35, -8), Vector2(8, 12), base_color)
+	_rect(Vector2(57, -8), Vector2(8, 12), base_color)
+	_rect(Vector2(44, -12), Vector2(12, 16), base_color.lightened(0.1))
+
+	# Glowing eyes/windows at top
+	_rect(Vector2(40, 15), Vector2(8, 10), Color(0.95, 0.5, 0.15))
+	_rect(Vector2(52, 15), Vector2(8, 10), Color(0.95, 0.5, 0.15))
+
+	# Armored gate
+	_rect(Vector2(35, 55), Vector2(30, 35), Color(0.25, 0.22, 0.2))
+	_rect(Vector2(37, 50), Vector2(26, 8), base_color.darkened(0.2))
+	_rect(Vector2(38, 58), Vector2(24, 30), Color(0.35, 0.32, 0.3))
+	# Metal reinforcement
+	for i in range(3):
+		_rect(Vector2(38, 62 + i * 9), Vector2(24, 3), Color(0.45, 0.42, 0.4))
+	_rect(Vector2(49, 58), Vector2(2, 30), Color(0.45, 0.42, 0.4))
+
+	# Side towers with fire braziers
+	_rect(Vector2(8, 28), Vector2(18, 62), base_color.darkened(0.08))
+	_rect(Vector2(74, 28), Vector2(18, 62), base_color.darkened(0.08))
+
+	# Braziers with fire
+	_rect(Vector2(12, 22), Vector2(10, 8), Color(0.4, 0.35, 0.3))
+	_rect(Vector2(14, 16), Vector2(6, 8), Color(0.95, 0.6, 0.2))
+	_rect(Vector2(15, 12), Vector2(4, 6), Color(1.0, 0.8, 0.3))
+
+	_rect(Vector2(78, 22), Vector2(10, 8), Color(0.4, 0.35, 0.3))
+	_rect(Vector2(80, 16), Vector2(6, 8), Color(0.95, 0.6, 0.2))
+	_rect(Vector2(81, 12), Vector2(4, 6), Color(1.0, 0.8, 0.3))
+
+	# Narrow windows
+	for i in range(4):
+		_rect(Vector2(12, 40 + i * 12), Vector2(4, 8), Color(0.95, 0.5, 0.2, 0.8))
+		_rect(Vector2(84, 40 + i * 12), Vector2(4, 8), Color(0.95, 0.5, 0.2, 0.8))
+
+	# Strong glow effect
+	_add_glow(base_color, 0.4)
+
+# ==================== NIVEL 13: MONUMENT ====================
 func _build_monument_detailed(base_color: Color) -> void:
 	# Grand plaza
 	_rect(Vector2(-5, 85), Vector2(110, 20), Color(0.75, 0.72, 0.65))
@@ -907,16 +1174,20 @@ func _update_badge() -> void:
 		level_badge.color = _get_badge_color()
 
 func _get_badge_color() -> Color:
-	if building_level >= 9:
-		return Color(0.95, 0.8, 0.15, 0.98)
+	if building_level >= 13:
+		return Color(0.95, 0.8, 0.15, 0.98)  # Gold for Monument/Wonder
+	elif building_level >= 11:
+		return Color(0.95, 0.5, 0.2, 0.97)   # Orange for Palace/Citadel
+	elif building_level >= 9:
+		return Color(0.65, 0.25, 0.75, 0.95) # Purple for Skyscraper/Castle
 	elif building_level >= 7:
-		return Color(0.65, 0.25, 0.75, 0.95)
+		return Color(0.25, 0.55, 0.85, 0.95) # Blue for Mansion/Tower
 	elif building_level >= 5:
-		return Color(0.25, 0.55, 0.85, 0.95)
+		return Color(0.25, 0.65, 0.35, 0.95) # Green for House/Villa
 	elif building_level >= 3:
-		return Color(0.25, 0.65, 0.35, 0.95)
+		return Color(0.5, 0.4, 0.3, 0.93)    # Brown for Cabin/Cottage
 	else:
-		return Color(0.35, 0.35, 0.45, 0.92)
+		return Color(0.35, 0.35, 0.45, 0.92) # Gray for Tent/Hut
 
 # ==================== INTERACTION ====================
 func _gui_input(event: InputEvent) -> void:

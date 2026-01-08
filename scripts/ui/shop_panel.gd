@@ -62,8 +62,8 @@ func _create_upgrade_item(upgrade_id: String) -> PanelContainer:
 	# Icono
 	var icon_label = Label.new()
 	icon_label.text = data.get("icon", "?")
-	icon_label.add_theme_font_size_override("font_size", 32)
-	icon_label.custom_minimum_size = Vector2(40, 40)
+	icon_label.add_theme_font_size_override("font_size", 36)
+	icon_label.custom_minimum_size = Vector2(44, 44)
 	icon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hbox.add_child(icon_label)
@@ -71,7 +71,7 @@ func _create_upgrade_item(upgrade_id: String) -> PanelContainer:
 	# Info container
 	var info_vbox = VBoxContainer.new()
 	info_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	info_vbox.add_theme_constant_override("separation", 2)
+	info_vbox.add_theme_constant_override("separation", 3)
 	hbox.add_child(info_vbox)
 
 	# Nombre y nivel
@@ -81,13 +81,13 @@ func _create_upgrade_item(upgrade_id: String) -> PanelContainer:
 	var name_label = Label.new()
 	name_label.name = "NameLabel"
 	name_label.text = data.get("name", "Unknown")
-	name_label.add_theme_font_size_override("font_size", 16)
+	name_label.add_theme_font_size_override("font_size", 20)
 	name_label.add_theme_color_override("font_color", Color.WHITE)
 	name_hbox.add_child(name_label)
 
 	var level_label = Label.new()
 	level_label.name = "LevelLabel"
-	level_label.add_theme_font_size_override("font_size", 14)
+	level_label.add_theme_font_size_override("font_size", 17)
 	level_label.add_theme_color_override("font_color", Color("#888899"))
 	name_hbox.add_child(level_label)
 
@@ -95,22 +95,22 @@ func _create_upgrade_item(upgrade_id: String) -> PanelContainer:
 	var desc_label = Label.new()
 	desc_label.name = "DescLabel"
 	desc_label.text = data.get("description", "")
-	desc_label.add_theme_font_size_override("font_size", 12)
+	desc_label.add_theme_font_size_override("font_size", 16)
 	desc_label.add_theme_color_override("font_color", Color("#AAAAAA"))
 	info_vbox.add_child(desc_label)
 
 	# Valor actual
 	var value_label = Label.new()
 	value_label.name = "ValueLabel"
-	value_label.add_theme_font_size_override("font_size", 13)
+	value_label.add_theme_font_size_override("font_size", 16)
 	value_label.add_theme_color_override("font_color", Color("#4CAF50"))
 	info_vbox.add_child(value_label)
 
 	# Botón de compra
 	var buy_button = Button.new()
 	buy_button.name = "BuyButton"
-	buy_button.custom_minimum_size = Vector2(90, 45)
-	buy_button.add_theme_font_size_override("font_size", 14)
+	buy_button.custom_minimum_size = Vector2(95, 50)
+	buy_button.add_theme_font_size_override("font_size", 18)
 
 	var btn_style = StyleBoxFlat.new()
 	btn_style.bg_color = Color("#4CAF50")

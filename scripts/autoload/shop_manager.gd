@@ -14,60 +14,60 @@ enum UpgradeType {
 	CRITICAL_MERGE        # Chance de saltar un nivel al hacer merge
 }
 
-# Datos de las mejoras
+# Datos de las mejoras - Balanced for progression
 var upgrades_data: Dictionary = {
 	"coin_multiplier": {
 		"name": "Coin Boost",
-		"description": "Increase coin generation",
+		"description": "+10% coins per level",
 		"icon": "💰",
-		"max_level": 20,
-		"base_cost": 100,
-		"cost_multiplier": 1.8,
+		"max_level": 25,
+		"base_cost": 50,
+		"cost_multiplier": 1.5,
 		"base_value": 1.0,
-		"value_per_level": 0.15,  # +15% por nivel
+		"value_per_level": 0.10,  # +10% por nivel
 		"type": UpgradeType.COIN_MULTIPLIER
 	},
 	"energy_capacity": {
 		"name": "Energy Tank",
-		"description": "Increase max energy",
+		"description": "+3 max energy per level",
 		"icon": "🔋",
-		"max_level": 10,
-		"base_cost": 200,
-		"cost_multiplier": 2.2,
+		"max_level": 15,
+		"base_cost": 75,
+		"cost_multiplier": 1.6,
 		"base_value": 10,
-		"value_per_level": 2,  # +2 energía máxima por nivel
+		"value_per_level": 3,  # +3 energía máxima por nivel
 		"type": UpgradeType.ENERGY_CAPACITY
 	},
 	"energy_regen": {
 		"name": "Fast Charge",
-		"description": "Faster energy regeneration",
+		"description": "-2s regen time per level",
 		"icon": "⚡",
-		"max_level": 15,
-		"base_cost": 150,
-		"cost_multiplier": 2.0,
+		"max_level": 12,
+		"base_cost": 60,
+		"cost_multiplier": 1.55,
 		"base_value": 30.0,
-		"value_per_level": -1.5,  # -1.5 segundos por nivel (mínimo 8 seg)
-		"min_value": 8.0,
+		"value_per_level": -2.0,  # -2 segundos por nivel (mínimo 6 seg)
+		"min_value": 6.0,
 		"type": UpgradeType.ENERGY_REGEN
 	},
 	"spawn_level_chance": {
 		"name": "Lucky Spawn",
-		"description": "Chance to spawn higher level",
+		"description": "+4% better spawn chance",
 		"icon": "🎲",
-		"max_level": 10,
-		"base_cost": 500,
-		"cost_multiplier": 2.5,
+		"max_level": 12,
+		"base_cost": 200,
+		"cost_multiplier": 1.7,
 		"base_value": 0.0,
-		"value_per_level": 0.05,  # +5% chance por nivel
+		"value_per_level": 0.04,  # +4% chance por nivel (max 48%)
 		"type": UpgradeType.SPAWN_LEVEL_CHANCE
 	},
 	"offline_earnings": {
 		"name": "Idle Income",
-		"description": "Better offline earnings",
+		"description": "+5% offline efficiency",
 		"icon": "😴",
 		"max_level": 10,
-		"base_cost": 300,
-		"cost_multiplier": 2.0,
+		"base_cost": 150,
+		"cost_multiplier": 1.65,
 		"base_value": 0.5,
 		"value_per_level": 0.05,  # +5% eficiencia offline por nivel (max 100%)
 		"max_value": 1.0,
@@ -75,13 +75,13 @@ var upgrades_data: Dictionary = {
 	},
 	"critical_merge": {
 		"name": "Super Merge",
-		"description": "Chance to skip a level on merge",
+		"description": "+2% skip level chance",
 		"icon": "✨",
-		"max_level": 8,
-		"base_cost": 1000,
-		"cost_multiplier": 3.0,
+		"max_level": 10,
+		"base_cost": 500,
+		"cost_multiplier": 2.0,
 		"base_value": 0.0,
-		"value_per_level": 0.03,  # +3% chance por nivel
+		"value_per_level": 0.02,  # +2% chance por nivel (max 20%)
 		"type": UpgradeType.CRITICAL_MERGE
 	}
 }
