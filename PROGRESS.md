@@ -6,7 +6,7 @@ El juego funciona correctamente en local y la APK se genera via GitHub Actions.
 
 ## Repositorio
 - **URL**: https://github.com/Josefinolis/mobile-civ-merging-game
-- **Última versión**: v1.1.1
+- **Última versión**: v1.3.0
 - **Release**: https://github.com/Josefinolis/mobile-civ-merging-game/releases
 
 ## Lo que está implementado
@@ -61,6 +61,28 @@ El juego funciona correctamente en local y la APK se genera via GitHub Actions.
 - [x] Bonus x2 monedas temporales en día 7
 - [x] Persistencia del streak y estado
 
+### Monetización (v1.3.0)
+
+#### In-App Purchases (Google Play Billing)
+- [x] Integración con Google Play Billing Library
+- [x] Detección automática de entorno (SIMULATED en editor, REAL en Android)
+- [x] 5 paquetes de monedas ($0.99 - $19.99)
+- [x] 3 paquetes de energía ($0.99 - $2.99)
+- [x] Bundles especiales (Starter Pack, Pro Pack)
+- [x] Suscripciones VIP (semanal y mensual)
+- [x] Opción "Remove Ads" ($2.99)
+- [x] Documentación completa: GOOGLE_PLAY_SETUP.md
+
+#### Publicidad (AdMob)
+- [x] Integración con AdMob
+- [x] Banner ads (parte inferior)
+- [x] Interstitial ads (cada 3 acciones, cooldown 60s)
+- [x] Rewarded video ads (+10 energía por video)
+- [x] Botón "Ver anuncio" junto al contador de energía
+- [x] Compra "Remove Ads" elimina banners e interstitials
+- [x] Scripts de instalación: setup_billing.sh, setup_ads.sh
+- [x] Documentación completa: ADMOB_SETUP.md
+
 ### CI/CD
 - [x] Workflow para generar APK automáticamente
 - [x] Debug keystore generado en CI
@@ -81,7 +103,9 @@ mobile-civ-merging-game/
 │   │   ├── quest_manager.gd   # Sistema de misiones
 │   │   ├── audio_manager.gd   # Audio y música
 │   │   ├── shop_manager.gd    # Sistema de tienda y upgrades
-│   │   └── daily_reward_manager.gd # Recompensas diarias
+│   │   ├── daily_reward_manager.gd # Recompensas diarias
+│   │   ├── iap_manager.gd     # In-App Purchases (Google Play)
+│   │   └── ads_manager.gd     # Publicidad (AdMob)
 │   ├── effects/
 │   │   └── particle_effects.gd # Efectos visuales
 │   ├── ui/
@@ -130,6 +154,7 @@ git tag v1.0.X && git push --tags
 | v1.1.0 | 2026-01-07 | Shop system con 6 upgrades, daily rewards de 7 días |
 | v1.1.1 | 2026-01-07 | Mejora visual: edificios detallados, fondo mejorado, celdas con estilo |
 | v1.1.2 | 2026-01-07 | Edificios centrados y escalados, UI con estilos mejorados |
+| v1.3.0 | 2026-01-09 | Sistema de monetización: IAP (Google Play Billing) + Ads (AdMob) |
 
 ## Notas técnicas
 

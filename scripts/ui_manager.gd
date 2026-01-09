@@ -6,6 +6,10 @@ class_name UIManager
 @onready var coins_title: Label = $TopBar/HBox/CoinsContainer/CoinsTitle
 @onready var energy_label: Label = $TopBar/HBox/EnergyContainer/EnergyLabel
 @onready var energy_title: Label = $TopBar/HBox/EnergyContainer/EnergyTitle
+@onready var energy_container: Control = $TopBar/HBox/EnergyContainer
+
+# Watch ad button (created dynamically)
+var watch_ad_button: Button = null
 @onready var income_label: Label = $TopBar/HBox/IncomeContainer/IncomeLabel
 @onready var income_title: Label = $TopBar/HBox/IncomeContainer/IncomeTitle
 @onready var spawn_button: Button = $BottomBar/HBox/SpawnButton
@@ -31,10 +35,18 @@ func _ready() -> void:
 	# Enhance UI with visual effects
 	_enhance_ui()
 
+	# Create watch ad button
+	_create_watch_ad_button()
+
 	# Connect signals
 	GameManager.coins_changed.connect(_on_coins_changed)
 	GameManager.energy_changed.connect(_on_energy_changed)
 	GameManager.building_unlocked.connect(_on_building_unlocked)
+
+	# Connect ads signals
+	AdsManager.rewarded_earned.connect(_on_ad_reward_earned)
+	AdsManager.rewarded_loaded.connect(_on_rewarded_ad_ready)
+	AdsManager.rewarded_closed.connect(_on_rewarded_ad_closed)
 
 	if spawn_button:
 		spawn_button.pressed.connect(_on_spawn_pressed)
@@ -79,6 +91,159 @@ func _ready() -> void:
 	# Initial UI update
 	_update_ui()
 	_update_daily_button_notification()
+
+func _create_watch_ad_button() -> void:
+	if not energy_container or not energy_label:
+		return
+
+	# Create a horizontal container to hold energy label and ad button
+	var hbox = HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 8)
+
+	# Get the parent and index of energy_label
+	var parent = energy_label.get_parent()
+	var index = energy_label.get_index()
+
+	# Remove energy_label from parent and add to hbox
+	parent.remove_child(energy_label)
+	hbox.add_child(energy_label)
+
+	# Create watch ad button with video play icon
+	watch_ad_button = Button.new()
+	watch_ad_button.text = "▶+%d" % AdsManager.get_rewarded_energy_amount()
+	watch_ad_button.tooltip_text = "Watch ad for free energy"
+	watch_ad_button.custom_minimum_size = Vector2(60, 32)
+
+	# Style the button (green, stands out)
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.2, 0.7, 0.3)
+	style.set_corner_radius_all(8)
+	style.border_color = Color(0.4, 1.0, 0.5)
+	style.set_border_width_all(2)
+	watch_ad_button.add_theme_stylebox_override("normal", style)
+
+	var hover_style = StyleBoxFlat.new()
+	hover_style.bg_color = Color(0.3, 0.85, 0.4)
+	hover_style.set_corner_radius_all(8)
+	hover_style.border_color = Color(0.5, 1.0, 0.6)
+	hover_style.set_border_width_all(2)
+	watch_ad_button.add_theme_stylebox_override("hover", hover_style)
+
+	var pressed_style = StyleBoxFlat.new()
+	pressed_style.bg_color = Color(0.15, 0.5, 0.2)
+	pressed_style.set_corner_radius_all(8)
+	watch_ad_button.add_theme_stylebox_override("pressed", pressed_style)
+
+	var disabled_style = StyleBoxFlat.new()
+	disabled_style.bg_color = Color(0.3, 0.3, 0.3, 0.6)
+	disabled_style.set_corner_radius_all(8)
+	watch_ad_button.add_theme_stylebox_override("disabled", disabled_style)
+
+	watch_ad_button.add_theme_font_size_override("font_size", 16)
+	watch_ad_button.add_theme_color_override("font_color", Color.WHITE)
+
+	# Add button to hbox
+	hbox.add_child(watch_ad_button)
+
+	# Insert hbox at original position
+	parent.add_child(hbox)
+	parent.move_child(hbox, index)
+
+	# Connect button press
+	watch_ad_button.pressed.connect(_on_watch_ad_pressed)
+
+	# Initial state
+	_update_watch_ad_button()
+
+func _update_watch_ad_button() -> void:
+	if not watch_ad_button:
+		return
+
+	# Hide button if ads are removed (but rewarded ads are always available)
+	# Enable/disable based on whether ad is ready
+	watch_ad_button.disabled = not AdsManager.is_rewarded_ad_ready()
+
+	# Pulse animation when ready
+	if AdsManager.is_rewarded_ad_ready():
+		watch_ad_button.modulate = Color(1, 1, 1, 1)
+	else:
+		watch_ad_button.modulate = Color(0.7, 0.7, 0.7, 1)
+
+func _on_watch_ad_pressed() -> void:
+	AudioManager.play_button_click()
+
+	# Button animation
+	if watch_ad_button:
+		var tween = watch_ad_button.create_tween()
+		tween.tween_property(watch_ad_button, "scale", Vector2(0.9, 0.9), 0.05)
+		tween.tween_property(watch_ad_button, "scale", Vector2(1.0, 1.0), 0.1)
+
+	if AdsManager.is_rewarded_ad_ready():
+		watch_ad_button.disabled = true
+		AdsManager.show_rewarded_ad()
+	else:
+		# Show "ad not ready" feedback
+		_show_ad_not_ready_message()
+
+func _on_ad_reward_earned(_reward_type: String, amount: int) -> void:
+	# Show reward popup
+	_show_energy_reward_popup(amount)
+	_update_ui()
+
+func _on_rewarded_ad_ready() -> void:
+	_update_watch_ad_button()
+
+func _on_rewarded_ad_closed() -> void:
+	_update_watch_ad_button()
+
+func _show_energy_reward_popup(amount: int) -> void:
+	# Create floating text showing energy gained
+	var popup = Label.new()
+	popup.text = "+%d ENERGY!" % amount
+	popup.add_theme_font_size_override("font_size", 32)
+	popup.add_theme_color_override("font_color", Color(0.3, 1.0, 0.4))
+	popup.add_theme_constant_override("outline_size", 3)
+	popup.add_theme_color_override("font_outline_color", Color.BLACK)
+	popup.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	popup.z_index = 100
+
+	# Position in center
+	popup.anchor_left = 0.5
+	popup.anchor_right = 0.5
+	popup.anchor_top = 0.4
+	popup.offset_left = -150
+	popup.offset_right = 150
+
+	add_child(popup)
+
+	# Animate up and fade out
+	var tween = popup.create_tween()
+	tween.tween_property(popup, "position:y", popup.position.y - 100, 1.5)
+	tween.parallel().tween_property(popup, "modulate:a", 0.0, 1.5).set_delay(0.5)
+	tween.tween_callback(popup.queue_free)
+
+func _show_ad_not_ready_message() -> void:
+	var popup = Label.new()
+	popup.text = "Ad loading..."
+	popup.add_theme_font_size_override("font_size", 20)
+	popup.add_theme_color_override("font_color", Color(1.0, 0.8, 0.3))
+	popup.add_theme_constant_override("outline_size", 2)
+	popup.add_theme_color_override("font_outline_color", Color.BLACK)
+	popup.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	popup.z_index = 100
+
+	popup.anchor_left = 0.5
+	popup.anchor_right = 0.5
+	popup.anchor_top = 0.4
+	popup.offset_left = -100
+	popup.offset_right = 100
+
+	add_child(popup)
+
+	var tween = popup.create_tween()
+	tween.tween_property(popup, "modulate:a", 0.0, 1.0).set_delay(1.0)
+	tween.tween_callback(popup.queue_free)
 
 func _enhance_ui() -> void:
 	# Create stylish bar backgrounds

@@ -26,6 +26,7 @@ QuestManager="*res://scripts/autoload/quest_manager.gd"
 ParticleEffects="*res://scripts/effects/particle_effects.gd"
 AudioManager="*res://scripts/autoload/audio_manager.gd"
 IAPManager="*res://scripts/autoload/iap_manager.gd"
+AdsManager="*res://scripts/autoload/ads_manager.gd"
 
 [display]
 

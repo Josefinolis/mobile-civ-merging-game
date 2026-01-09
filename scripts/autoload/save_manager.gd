@@ -31,6 +31,8 @@ func save_game() -> void:
 		"daily_reward_data": DailyRewardManager.serialize(),
 		# IAP data
 		"iap_data": IAPManager.serialize(),
+		# Ads data
+		"ads_data": AdsManager.serialize(),
 	}
 
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -111,6 +113,10 @@ func load_game() -> void:
 	# Restore IAP data
 	if save_data.has("iap_data"):
 		IAPManager.deserialize(save_data.get("iap_data", {}))
+
+	# Restore Ads data
+	if save_data.has("ads_data"):
+		AdsManager.deserialize(save_data.get("ads_data", {}))
 
 	# Calculate offline earnings
 	var saved_timestamp: float = save_data.get("timestamp", 0)
