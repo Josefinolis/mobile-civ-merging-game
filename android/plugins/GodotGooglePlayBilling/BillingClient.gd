@@ -74,14 +74,14 @@ func _init() -> void:
 		printerr(_plugin_name, " singleton not found!")
 
 func _connect_signals() -> void:
-	_plugin_singleton.connect("connected", connected.emit)
-	_plugin_singleton.connect("disconnected", disconnected.emit)
-	_plugin_singleton.connect("connect_error", connect_error.emit)
-	_plugin_singleton.connect("query_product_details_response", query_product_details_response.emit)
-	_plugin_singleton.connect("query_purchases_response", query_purchases_response.emit)
-	_plugin_singleton.connect("on_purchase_updated", on_purchase_updated.emit)
-	_plugin_singleton.connect("consume_purchase_response", consume_purchase_response.emit)
-	_plugin_singleton.connect("acknowledge_purchase_response", acknowledge_purchase_response.emit)
+	_plugin_singleton.connect("connected", func(): connected.emit())
+	_plugin_singleton.connect("disconnected", func(): disconnected.emit())
+	_plugin_singleton.connect("connect_error", func(code: int, msg: String): connect_error.emit(code, msg))
+	_plugin_singleton.connect("query_product_details_response", func(response: Dictionary): query_product_details_response.emit(response))
+	_plugin_singleton.connect("query_purchases_response", func(response: Dictionary): query_purchases_response.emit(response))
+	_plugin_singleton.connect("on_purchase_updated", func(response: Dictionary): on_purchase_updated.emit(response))
+	_plugin_singleton.connect("consume_purchase_response", func(response: Dictionary): consume_purchase_response.emit(response))
+	_plugin_singleton.connect("acknowledge_purchase_response", func(response: Dictionary): acknowledge_purchase_response.emit(response))
 
 func start_connection() -> void:
 	if _plugin_singleton:

@@ -12,6 +12,7 @@ android/build/
 *.apk
 *.aab
 *.keystore
+keystore-credentials.txt
 
 # iOS export
 *.ipa
