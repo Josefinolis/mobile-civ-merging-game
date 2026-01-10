@@ -28,16 +28,14 @@ signal rewarded_closed()
 # Set to true to ALWAYS use simulated ads (even on Android with plugin)
 const FORCE_SIMULATE: bool = false
 
-# AdMob App ID (replace with your real App ID for production)
-# Test App ID for development
-const ADMOB_APP_ID_ANDROID: String = "ca-app-pub-3940256099942544~3347511713"  # Test ID
-const ADMOB_APP_ID_IOS: String = "ca-app-pub-3940256099942544~1458002511"  # Test ID
+# AdMob App ID (production)
+const ADMOB_APP_ID_ANDROID: String = "ca-app-pub-9924441769526161~3498220200"
+const ADMOB_APP_ID_IOS: String = "ca-app-pub-3940256099942544~1458002511"  # Test ID (no iOS yet)
 
-# Ad Unit IDs (replace with your real Ad Unit IDs for production)
-# These are official Google test ad unit IDs
-const BANNER_AD_UNIT_ID: String = "ca-app-pub-3940256099942544/6300978111"  # Test
-const INTERSTITIAL_AD_UNIT_ID: String = "ca-app-pub-3940256099942544/1033173712"  # Test
-const REWARDED_AD_UNIT_ID: String = "ca-app-pub-3940256099942544/5224354917"  # Test
+# Ad Unit IDs (production)
+const BANNER_AD_UNIT_ID: String = "ca-app-pub-9924441769526161/4001439626"
+const INTERSTITIAL_AD_UNIT_ID: String = "ca-app-pub-9924441769526161/6601868023"
+const REWARDED_AD_UNIT_ID: String = "ca-app-pub-9924441769526161/6823221699"
 
 # Reward configuration
 const REWARDED_ENERGY_AMOUNT: int = 10  # Energy given for watching a rewarded ad
