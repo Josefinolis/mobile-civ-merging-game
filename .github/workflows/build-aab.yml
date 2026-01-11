@@ -157,14 +157,25 @@ jobs:
       - name: Create builds directory
         run: mkdir -p builds
 
-      - name: Import project
+      - name: Import project and initialize editor
         run: |
+          # First import
           godot --headless --import
-          godot --headless -e --quit || true
+          # Open editor briefly to initialize android template
+          timeout 30 godot --headless -e --quit || true
+          # Verify .build_version exists
+          cat android/build/.build_version || echo "Warning: .build_version not found"
+          ls -la android/build/
 
       - name: Build AAB
         run: |
-          godot --headless --export-release "Android Release" builds/merge-town-release.aab
+          godot --headless --verbose --export-release "Android Release" builds/merge-town-release.aab 2>&1 || {
+            echo "=== Export failed, checking logs ==="
+            cat export_presets.cfg
+            echo "=== Keystore check ==="
+            ls -la *.keystore || echo "No keystore found"
+            exit 1
+          }
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
