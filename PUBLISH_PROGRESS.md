@@ -1,7 +1,7 @@
 # Progreso de Publicación - Merge Town
 
-## Estado actual: EN PROGRESO
-**Fecha**: 10 de enero de 2026
+## Estado actual: PENDIENTE APROBACIÓN DE CUENTA
+**Fecha**: 11 de enero de 2026
 
 ---
 
@@ -41,35 +41,35 @@ Archivo actualizado: `scripts/autoload/ads_manager.gd`
   - Anuncios
   - Seguridad de datos
 
-### 5. APK firmado generado
-- **Archivo**: `builds/merge-town-release.apk`
+### 5. AAB generado y subido
+- **Archivo**: `builds/merge-town-release.aab`
+- **Version Code**: 4
+- **Target SDK**: 35
+- **Min SDK**: 21
 - Firmado con keystore de release
 - Contiene IDs de AdMob reales
+- Permiso `AD_ID` incluido para AdMob
+- **Subido a Google Play Console** (Pruebas internas)
+
+### 6. Configuración de Android corregida
+- `AndroidManifest.xml`: Añadido permiso `com.google.android.gms.permission.AD_ID`
+- `config.gradle`: Target SDK y Compile SDK actualizados a 35
 
 ---
 
 ## Pendiente
 
-### 1. Generar AAB (Android App Bundle)
-Google Play requiere AAB, no APK. El problema actual:
-- Godot no detecta el archivo `.build_version` del template de gradle
-- Error: "Trying to build from a gradle built template, but no version info"
+### 1. Aprobación de cuenta de desarrollador
+- Google está revisando la cuenta de desarrollador
+- Tiempo estimado: 1-7 días
+- Una vez aprobada, se podrá publicar a pruebas internas
 
-**Soluciones posibles**:
-1. Usar GitHub Actions para generar el AAB (modificar workflow)
-2. Abrir Godot con interfaz gráfica y reinstalar el template desde "Proyecto > Exportar > Gestionar plantillas de exportación"
-3. Usar bundletool de Google para convertir APK a AAB (investigar)
-
-### 2. Subir AAB a Google Play Console
-- Ir a: Probar y publicar → Pruebas internas → Crear versión
-- Subir el archivo .aab
-- Nombre de versión: 1.0.0
-
-### 3. Configurar testers
-- Añadir joseluismc81@gmail.com como tester
+### 2. Configurar testers
+- Ir a: Pruebas internas → Testers
 - Crear lista de testers
+- Añadir emails de testers
 
-### 4. (Opcional) Configurar productos IAP
+### 3. (Opcional) Configurar productos IAP
 Productos definidos en `scripts/autoload/iap_manager.gd`:
 - coins_small, coins_medium, coins_large
 - energy_small, energy_medium, energy_full
@@ -85,37 +85,53 @@ Productos definidos en `scripts/autoload/iap_manager.gd`:
 | `release.keystore` | Keystore para firmar (NO SUBIR A GIT) |
 | `keystore-credentials.txt` | Contraseñas del keystore (NO SUBIR A GIT) |
 | `export_presets.cfg` | Configuración de exportación Android |
-| `builds/merge-town-release.apk` | APK firmado actual |
-| `builds/icon_512x512.png` | Icono para Play Store |
-| `builds/feature_graphic.png` | Gráfico de funciones |
-| `builds/screenshot_1.png` | Captura 1 |
-| `builds/screenshot_2.png` | Captura 2 |
+| `builds/merge-town-release.aab` | AAB firmado actual |
+| `builds/merge-town-release.apk` | APK firmado (backup) |
+| `android/build/AndroidManifest.xml` | Manifest con permiso AD_ID |
 
 ---
 
-## Comandos útiles
+## Notas técnicas
 
+### Generación de AAB
+- **Problema encontrado**: Godot en modo headless no puede generar AAB con gradle build (bug conocido)
+- **Solución**: Usar Godot con interfaz gráfica (WSLg en WSL2)
+- **Comando para abrir editor**:
 ```bash
-# Generar APK (funciona)
-/home/os_uis/Godot_v4.2.2-stable_linux.x86_64 --headless --export-release "Android Release" builds/merge-town-release.apk
+/home/os_uis/Godot_v4.2.2-stable_linux.x86_64 --editor --path /home/os_uis/projects/mobile-civ-merging-game
+```
 
-# Intentar generar AAB (actualmente falla)
-xvfb-run -a /home/os_uis/Godot_v4.2.2-stable_linux.x86_64 --path . --export-release "Android Release" builds/merge-town-release.aab
+### Exportar AAB desde Godot GUI
+1. Proyecto → Exportar
+2. Seleccionar "Android Release"
+3. Configurar:
+   - Gradle Build: ✓
+   - Export Format: AAB
+   - Target SDK: 35
+   - Version Code: incrementar cada vez
+4. Keystore Release: `/home/os_uis/projects/mobile-civ-merging-game/release.keystore`
+5. Release User: `merge_town`
+6. Desmarcar "Export With Debug"
+7. Exportar proyecto
 
-# Acceder a archivos desde Windows
+### Acceder a archivos desde Windows
+```
 \\wsl$\Ubuntu\home\os_uis\projects\mobile-civ-merging-game\builds\
 ```
 
 ---
 
-## Commits realizados hoy
-1. `aa89fa0` - Add privacy policy and fix billing plugin
-2. `379bd00` - Update AdMob IDs to production values
+## Historial de versiones subidas
+
+| Version Code | Version Name | Fecha | Notas |
+|--------------|--------------|-------|-------|
+| 4 | 1.0.0 | 2026-01-11 | Primera versión con Target SDK 35 y AD_ID |
 
 ---
 
-## Próximos pasos mañana
-1. Resolver el problema del AAB (template de gradle)
-2. Subir AAB a Google Play Console
-3. Iniciar pruebas internas
-4. Revisar y publicar
+## Próximos pasos
+1. Esperar aprobación de cuenta de Google
+2. Configurar testers en Google Play Console
+3. Probar la app desde Play Store (pruebas internas)
+4. Corregir bugs si los hay
+5. Publicar a producción
