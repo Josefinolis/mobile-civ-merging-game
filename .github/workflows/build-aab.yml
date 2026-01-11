@@ -1,0 +1,171 @@
+name: Build Android AAB
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version name (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+      version_code:
+        description: 'Version code (integer)'
+        required: true
+        default: '1'
+
+permissions:
+  contents: write
+
+env:
+  GODOT_VERSION: 4.2.2
+  EXPORT_NAME: merge-town
+
+jobs:
+  build-aab:
+    name: Build Android AAB
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.2.2
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Setup Java 17
+        run: |
+          apt-get update
+          apt-get install -y openjdk-17-jdk
+          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+
+      - name: Setup Android SDK
+        run: |
+          mkdir -p /root/Android/Sdk
+          cd /root/Android/Sdk
+          # Download command line tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          unzip -q cmdline-tools.zip
+          mkdir -p cmdline-tools/latest
+          mv cmdline-tools/bin cmdline-tools/latest/
+          mv cmdline-tools/lib cmdline-tools/latest/
+          # Accept licenses and install required components
+          yes | cmdline-tools/latest/bin/sdkmanager --licenses || true
+          cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Setup export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Install Android build template
+        run: |
+          mkdir -p android/build
+          unzip ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip -d android/build/
+          echo "${GODOT_VERSION}.stable" > android/build/.build_version
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+
+      - name: Configure Godot editor settings
+        run: |
+          mkdir -p ~/.config/godot
+          cat > ~/.config/godot/editor_settings-4.tres << 'EDITOR_EOF'
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
+          export/android/android_sdk_path = "/root/Android/Sdk"
+          export/android/debug_keystore = ""
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          EDITOR_EOF
+
+      - name: Create export presets for AAB
+        run: |
+          cat > export_presets.cfg << 'EOF'
+          [preset.0]
+
+          name="Android Release"
+          platform="Android"
+          runnable=true
+          dedicated_server=false
+          custom_features=""
+          export_filter="all_resources"
+          include_filter=""
+          exclude_filter=""
+          export_path="builds/merge-town-release.aab"
+          encryption_include_filters=""
+          encryption_exclude_filters=""
+          encrypt_pck=false
+          encrypt_directory=false
+
+          [preset.0.options]
+
+          custom_template/debug=""
+          custom_template/release=""
+          gradle_build/use_gradle_build=true
+          gradle_build/export_format=1
+          gradle_build/min_sdk=24
+          gradle_build/target_sdk=34
+          architectures/armeabi-v7a=false
+          architectures/arm64-v8a=true
+          architectures/x86=false
+          architectures/x86_64=false
+          version/code=${{ github.event.inputs.version_code }}
+          version/name="${{ github.event.inputs.version_name }}"
+          package/unique_name="com.mergetowngame.app"
+          package/name="Merge Town"
+          package/signed=true
+          package/app_category=2
+          package/retain_data_on_uninstall=false
+          package/exclude_from_recents=false
+          package/show_in_android_tv=false
+          package/show_in_app_library=true
+          package/show_as_launcher_app=false
+          launcher_icons/main_192x192=""
+          launcher_icons/adaptive_foreground_432x432=""
+          launcher_icons/adaptive_background_432x432=""
+          graphics/opengl_debug=false
+          xr_features/xr_mode=0
+          screen/immersive_mode=true
+          screen/support_small=true
+          screen/support_normal=true
+          screen/support_large=true
+          screen/support_xlarge=true
+          user_data_backup/allow=false
+          command_line/extra_args=""
+          apk_expansion/enable=false
+          apk_expansion/SALT=""
+          apk_expansion/public_key=""
+          permissions/custom_permissions=PackedStringArray()
+          permissions/access_network_state=true
+          permissions/internet=true
+          permissions/vibrate=true
+          permissions/wake_lock=true
+          keystore/debug=""
+          keystore/debug_user=""
+          keystore/debug_password=""
+          keystore/release="${GITHUB_WORKSPACE}/release.keystore"
+          keystore/release_user="${{ secrets.KEYSTORE_ALIAS }}"
+          keystore/release_password="${{ secrets.KEYSTORE_PASSWORD }}"
+          EOF
+
+      - name: Create builds directory
+        run: mkdir -p builds
+
+      - name: Import project
+        run: |
+          godot --headless --import
+          godot --headless -e --quit || true
+
+      - name: Build AAB
+        run: |
+          godot --headless --export-release "Android Release" builds/merge-town-release.aab
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab-${{ github.event.inputs.version_name }}
+          path: builds/merge-town-release.aab
+          retention-days: 30
