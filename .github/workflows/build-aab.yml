@@ -82,8 +82,11 @@ jobs:
           EDITOR_EOF
 
       - name: Create export presets for AAB
+        env:
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
-          cat > export_presets.cfg << 'EOF'
+          cat > export_presets.cfg << EOF
           [preset.0]
 
           name="Android Release"
@@ -146,9 +149,9 @@ jobs:
           keystore/debug=""
           keystore/debug_user=""
           keystore/debug_password=""
-          keystore/release="${GITHUB_WORKSPACE}/release.keystore"
-          keystore/release_user="${{ secrets.KEYSTORE_ALIAS }}"
-          keystore/release_password="${{ secrets.KEYSTORE_PASSWORD }}"
+          keystore/release="$(pwd)/release.keystore"
+          keystore/release_user="$KEYSTORE_ALIAS"
+          keystore/release_password="$KEYSTORE_PASSWORD"
           EOF
 
       - name: Create builds directory
