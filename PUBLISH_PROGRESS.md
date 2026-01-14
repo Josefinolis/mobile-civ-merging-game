@@ -1,7 +1,7 @@
 # Progreso de Publicación - Merge Town
 
-## Estado actual: PENDIENTE APROBACIÓN DE CUENTA
-**Fecha**: 11 de enero de 2026
+## Estado actual: PRUEBAS INTERNAS COMPLETADAS
+**Fecha**: 14 de enero de 2026
 
 ---
 
@@ -41,15 +41,15 @@ Archivo actualizado: `scripts/autoload/ads_manager.gd`
   - Anuncios
   - Seguridad de datos
 
-### 5. AAB generado y subido
+### 5. AAB generado y listo
 - **Archivo**: `builds/merge-town-release.aab`
-- **Version Code**: 4
+- **Version Code**: 7
 - **Target SDK**: 35
 - **Min SDK**: 21
 - Firmado con keystore de release
 - Contiene IDs de AdMob reales
 - Permiso `AD_ID` incluido para AdMob
-- **Subido a Google Play Console** (Pruebas internas)
+- **Probado en emulador**: Botones funcionan correctamente
 
 ### 6. Configuración de Android corregida
 - `AndroidManifest.xml`: Añadido permiso `com.google.android.gms.permission.AD_ID`
@@ -85,8 +85,8 @@ Productos definidos en `scripts/autoload/iap_manager.gd`:
 | `release.keystore` | Keystore para firmar (NO SUBIR A GIT) |
 | `keystore-credentials.txt` | Contraseñas del keystore (NO SUBIR A GIT) |
 | `export_presets.cfg` | Configuración de exportación Android |
-| `builds/merge-town-release.aab` | AAB firmado actual |
-| `builds/merge-town-release.apk` | APK firmado (backup) |
+| `builds/merge-town-release.aab` | AAB firmado actual (v7) |
+| `builds/merge-town-test.apk` | APK para testing local (v7) |
 | `android/build/AndroidManifest.xml` | Manifest con permiso AD_ID |
 
 ---
@@ -119,6 +119,23 @@ Productos definidos en `scripts/autoload/iap_manager.gd`:
 \\wsl$\Ubuntu\home\os_uis\projects\mobile-civ-merging-game\builds\
 ```
 
+### Solución a problemas de botones/scripts (2026-01-14)
+**Problema**: Los botones no funcionaban en el APK/AAB exportado.
+
+**Causa**: Caché corrupta en `.godot/` y `android/build/` causando errores:
+```
+SCRIPT ERROR: Class "UIManager" hides a global script class.
+SCRIPT ERROR: Class "GameGrid" hides a global script class.
+```
+
+**Solución**:
+1. Cerrar Godot
+2. Eliminar directorios: `rm -rf .godot android/build`
+3. Abrir Godot de nuevo
+4. Proyecto → Instalar plantilla de compilación de Android
+5. Configurar keystore en opciones de exportación
+6. Exportar AAB/APK
+
 ---
 
 ## Historial de versiones subidas
@@ -126,12 +143,13 @@ Productos definidos en `scripts/autoload/iap_manager.gd`:
 | Version Code | Version Name | Fecha | Notas |
 |--------------|--------------|-------|-------|
 | 4 | 1.0.0 | 2026-01-11 | Primera versión con Target SDK 35 y AD_ID |
+| 6 | 1.0.0 | 2026-01-14 | Intento de fix (falló por caché corrupta) |
+| 7 | 1.0.0 | 2026-01-14 | Fix completo: limpieza de caché, botones funcionan |
 
 ---
 
 ## Próximos pasos
-1. Esperar aprobación de cuenta de Google
-2. Configurar testers en Google Play Console
-3. Probar la app desde Play Store (pruebas internas)
-4. Corregir bugs si los hay
-5. Publicar a producción
+1. ~~Subir `merge-town-release.aab` a Google Play Console~~ ✓
+2. ~~Configurar testers en Google Play Console~~ ✓
+3. ~~Probar la app desde Play Store (pruebas internas)~~ ✓ Botones funcionan
+4. Publicar a producción
