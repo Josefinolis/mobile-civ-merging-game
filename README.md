@@ -104,12 +104,14 @@ Download the latest APK from the [Releases](../../releases) page.
 - [x] Sound effects and music
 - [x] Quest system
 - [x] Settings menu
+- [x] Daily rewards
+- [x] Shop system (upgrades)
+- [x] Ad integration (AdMob: banners, interstitials, rewarded)
+- [x] In-app purchases (Google Play Billing)
+- [x] Published to Google Play (internal testing)
 - [ ] Achievement system
-- [ ] Daily rewards
 - [ ] Special events
 - [ ] Premium buildings
-- [ ] Ad integration (rewarded videos)
-- [ ] In-app purchases
 - [ ] Leaderboards
 - [ ] iOS support
 

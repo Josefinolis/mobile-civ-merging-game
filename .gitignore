@@ -13,6 +13,7 @@ android/build/
 *.aab
 *.keystore
 keystore-credentials.txt
+google-play-credentials.json
 
 # iOS export
 *.ipa

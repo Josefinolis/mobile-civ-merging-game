@@ -88,8 +88,19 @@ grow_horizontal = 2
 
 [node name="HBox" type="HBoxContainer" parent="TopBar"]
 layout_mode = 2
-theme_override_constants/separation = 20
-alignment = 1
+theme_override_constants/separation = 15
+
+[node name="SettingsButton" type="Button" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 28
+text = "⚙"
+flat = true
+
+[node name="Spacer1" type="Control" parent="TopBar/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="CoinsContainer" type="VBoxContainer" parent="TopBar/HBox"]
 layout_mode = 2
@@ -142,13 +153,9 @@ theme_override_font_sizes/font_size = 32
 text = "+0/s"
 horizontal_alignment = 1
 
-[node name="SettingsButton" type="Button" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(60, 60)
+[node name="Spacer2" type="Control" parent="TopBar/HBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 28
-text = "⚙"
-flat = true
+size_flags_horizontal = 3
 
 [node name="GridContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -214,8 +221,8 @@ text = "🎁"
 custom_minimum_size = Vector2(220, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
-text = "BUILD NEW"
+theme_override_font_sizes/font_size = 26
+text = "🏗️ BUILD"
 
 [node name="ShopButton" type="Button" parent="BottomBar/HBox"]
 custom_minimum_size = Vector2(70, 80)
@@ -323,7 +330,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.84, 0, 1)
 theme_override_font_sizes/font_size = 28
-text = "SETTINGS"
+text = "⚙️ SETTINGS"
 
 [node name="CloseButton" type="Button" parent="SettingsPanel/MarginContainer/VBox/Header"]
 custom_minimum_size = Vector2(50, 50)
@@ -424,7 +431,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.3, 0.69, 0.31, 1)
 theme_override_font_sizes/font_size = 28
-text = "SHOP"
+text = "🛒 SHOP"
 
 [node name="CoinsLabel" type="Label" parent="ShopPanel/MarginContainer/VBox/Header"]
 layout_mode = 2
@@ -490,7 +497,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.84, 0, 1)
 theme_override_font_sizes/font_size = 28
-text = "DAILY REWARDS"
+text = "🎁 DAILY REWARDS"
 
 [node name="CloseButton" type="Button" parent="DailyRewardPanel/MarginContainer/VBox/Header"]
 custom_minimum_size = Vector2(50, 50)
@@ -567,7 +574,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.6, 0.2, 1)
 theme_override_font_sizes/font_size = 28
-text = "STORE"
+text = "💎 STORE"
 
 [node name="CoinsLabel" type="Label" parent="IAPPanel/MarginContainer/VBox/Header"]
 layout_mode = 2
