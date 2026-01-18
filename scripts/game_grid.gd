@@ -12,7 +12,6 @@ const BUILDING_SCENE_PATH = "res://scenes/building.tscn"
 var building_scene: PackedScene
 var buildings: Array = []  # 2D array of Building nodes
 var dragged_building = null
-var highlight_cell: Vector2i = Vector2i(-1, -1)
 
 @onready var cells_container: Control = $CellsContainer
 @onready var buildings_container: Control = $BuildingsContainer

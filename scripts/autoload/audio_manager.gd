@@ -64,90 +64,45 @@ func _get_available_player() -> AudioStreamPlayer:
 
 # === SOUND EFFECTS ===
 
-func play_spawn() -> void:
+# Helper to play cached SFX with optional volume multiplier and pitch variation
+func _play_sfx(sfx_key: String, volume_mult: float = 1.0, pitch_min: float = 1.0, pitch_max: float = 1.0) -> void:
 	if not master_enabled or not sfx_enabled:
 		return
 	var player = _get_available_player()
-	player.stream = _cached_sounds["spawn"]
-	player.volume_db = linear_to_db(sfx_volume * 0.6)
-	player.pitch_scale = randf_range(0.95, 1.05)
+	player.stream = _cached_sounds[sfx_key]
+	player.volume_db = linear_to_db(sfx_volume * volume_mult)
+	player.pitch_scale = randf_range(pitch_min, pitch_max) if pitch_min != pitch_max else 1.0
 	player.play()
+
+func play_spawn() -> void:
+	_play_sfx("spawn", 0.6, 0.95, 1.05)
 
 func play_merge() -> void:
-	if not master_enabled or not sfx_enabled:
-		return
-	var player = _get_available_player()
-	player.stream = _cached_sounds["merge"]
-	player.volume_db = linear_to_db(sfx_volume * 0.8)
-	player.pitch_scale = randf_range(0.98, 1.02)
-	player.play()
+	_play_sfx("merge", 0.8, 0.98, 1.02)
 
 func play_level_up() -> void:
-	if not master_enabled or not sfx_enabled:
-		return
-	var player = _get_available_player()
-	player.stream = _cached_sounds["levelup"]
-	player.volume_db = linear_to_db(sfx_volume)
-	player.play()
+	_play_sfx("levelup")
 
 func play_button_click() -> void:
-	if not master_enabled or not sfx_enabled:
-		return
-	var player = _get_available_player()
-	player.stream = _cached_sounds["click"]
-	player.volume_db = linear_to_db(sfx_volume * 0.5)
-	player.pitch_scale = randf_range(0.98, 1.02)
-	player.play()
+	_play_sfx("click", 0.5, 0.98, 1.02)
 
 func play_pickup() -> void:
-	if not master_enabled or not sfx_enabled:
-		return
-	var player = _get_available_player()
-	player.stream = _cached_sounds["pickup"]
-	player.volume_db = linear_to_db(sfx_volume * 0.4)
-	player.pitch_scale = randf_range(0.95, 1.05)
-	player.play()
+	_play_sfx("pickup", 0.4, 0.95, 1.05)
 
 func play_drop() -> void:
-	if not master_enabled or not sfx_enabled:
-		return
-	var player = _get_available_player()
-	player.stream = _cached_sounds["drop"]
-	player.volume_db = linear_to_db(sfx_volume * 0.5)
-	player.play()
+	_play_sfx("drop", 0.5)
 
 func play_error() -> void:
-	if not master_enabled or not sfx_enabled:
-		return
-	var player = _get_available_player()
-	player.stream = _cached_sounds["error"]
-	player.volume_db = linear_to_db(sfx_volume * 0.4)
-	player.play()
+	_play_sfx("error", 0.4)
 
 func play_coin() -> void:
-	if not master_enabled or not sfx_enabled:
-		return
-	var player = _get_available_player()
-	player.stream = _cached_sounds["coin"]
-	player.volume_db = linear_to_db(sfx_volume * 0.3)
-	player.pitch_scale = randf_range(0.9, 1.1)
-	player.play()
+	_play_sfx("coin", 0.3, 0.9, 1.1)
 
 func play_quest_complete() -> void:
-	if not master_enabled or not sfx_enabled:
-		return
-	var player = _get_available_player()
-	player.stream = _cached_sounds["quest_complete"]
-	player.volume_db = linear_to_db(sfx_volume)
-	player.play()
+	_play_sfx("quest_complete")
 
 func play_achievement() -> void:
-	if not master_enabled or not sfx_enabled:
-		return
-	var player = _get_available_player()
-	player.stream = _cached_sounds["achievement"]
-	player.volume_db = linear_to_db(sfx_volume * 1.2)
-	player.play()
+	_play_sfx("achievement", 1.2)
 
 # === IMPROVED SOUND GENERATION ===
 

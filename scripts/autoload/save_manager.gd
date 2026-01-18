@@ -59,10 +59,13 @@ func load_game() -> void:
 	var json = JSON.new()
 	var error = json.parse(json_string)
 	if error != OK:
-		print("Error parsing save file: ", json.get_error_message())
+		_handle_corrupted_save(json_string, json.get_error_message())
 		return
 
-	var save_data: Dictionary = json.get_data()
+	var save_data = json.get_data()
+	if not save_data is Dictionary:
+		_handle_corrupted_save(json_string, "Save data is not a valid dictionary")
+		return
 
 	# Restore game state
 	GameManager.coins = save_data.get("coins", 0)
@@ -162,6 +165,24 @@ func _calculate_offline_earnings(saved_timestamp: float) -> void:
 		if offline_coins > 0:
 			GameManager.coins += offline_coins
 			print("Earned ", offline_coins, " coins while away!")
+
+func _handle_corrupted_save(json_string: String, error_msg: String) -> void:
+	push_error("SAVE FILE CORRUPTED: " + error_msg)
+
+	# Create backup of corrupted file
+	var backup_path = SAVE_PATH.replace(".json", "_corrupted_%d.json" % int(Time.get_unix_time_from_system()))
+	var backup_file = FileAccess.open(backup_path, FileAccess.WRITE)
+	if backup_file:
+		backup_file.store_string(json_string)
+		backup_file.close()
+		print("Corrupted save backed up to: ", backup_path)
+
+	# Delete corrupted save so game can start fresh
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+	print("Corrupted save removed. Starting fresh game.")
+
+	# Initialize for new player
+	DailyRewardManager.check_reward_availability()
 
 func _notification(what: int) -> void:
 	# Auto-save when app goes to background or closes
