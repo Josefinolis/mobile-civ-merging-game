@@ -58,68 +58,6 @@ var is_connected: bool = false
 # Product definitions with Google Play product IDs
 # IMPORTANT: These IDs must match exactly in Google Play Console
 var products: Dictionary = {
-	# Coin packs (consumable)
-	"coins_tiny": {
-		"name": "Coin Pouch",
-		"description": "+300 coins",
-		"icon": "💰",
-		"type": ProductType.COINS,
-		"billing_type": BillingType.INAPP,
-		"consumable": true,
-		"amount": 300,
-		"price": "$0.49",
-		"price_value": 0.49
-	},
-	"coins_small": {
-		"name": "Coin Bag",
-		"description": "+800 coins",
-		"icon": "💰",
-		"type": ProductType.COINS,
-		"billing_type": BillingType.INAPP,
-		"consumable": true,
-		"amount": 800,
-		"price": "$0.49",
-		"price_value": 0.49,
-		"bonus": "+33% value"
-	},
-	"coins_medium": {
-		"name": "Coin Chest",
-		"description": "+2,500 coins",
-		"icon": "💰💰",
-		"type": ProductType.COINS,
-		"billing_type": BillingType.INAPP,
-		"consumable": true,
-		"amount": 2500,
-		"price": "$0.99",
-		"price_value": 0.99,
-		"bonus": "+65% value",
-		"popular": true
-	},
-	"coins_large": {
-		"name": "Coin Vault",
-		"description": "+6,000 coins",
-		"icon": "💰💰💰",
-		"type": ProductType.COINS,
-		"billing_type": BillingType.INAPP,
-		"consumable": true,
-		"amount": 6000,
-		"price": "$2.49",
-		"price_value": 2.49,
-		"bonus": "+100% value"
-	},
-	"coins_mega": {
-		"name": "Coin Treasury",
-		"description": "+15,000 coins",
-		"icon": "🏦",
-		"type": ProductType.COINS,
-		"billing_type": BillingType.INAPP,
-		"consumable": true,
-		"amount": 15000,
-		"price": "$4.99",
-		"price_value": 4.99,
-		"bonus": "+150% value",
-		"best_value": true
-	},
 	# Energy packs (consumable)
 	"energy_small": {
 		"name": "Energy Drink",
@@ -129,7 +67,7 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": 15,
-		"price": "$0.49",
+		"price": "€0.49",
 		"price_value": 0.49
 	},
 	"energy_medium": {
@@ -140,8 +78,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": 40,
-		"price": "$0.49",
-		"price_value": 0.49,
+		"price": "€0.99",
+		"price_value": 0.99,
 		"bonus": "+33% value"
 	},
 	"energy_full": {
@@ -152,8 +90,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": -1,  # Special: fills to max + 10
-		"price": "$0.49",
-		"price_value": 0.49,
+		"price": "€1.49",
+		"price_value": 1.49,
 		"popular": true
 	},
 	# Special packs (non-consumable, one-time purchase)
@@ -168,8 +106,8 @@ var products: Dictionary = {
 		"coins": 2000,
 		"energy": 30,
 		"coin_boost_minutes": 30,
-		"price": "$0.49",
-		"price_value": 0.49,
+		"price": "€0.99",
+		"price_value": 0.99,
 		"best_value": true
 	},
 	"pro_pack": {
@@ -183,8 +121,8 @@ var products: Dictionary = {
 		"coins": 5000,
 		"energy": 50,
 		"coin_boost_minutes": 60,
-		"price": "$1.49",
-		"price_value": 1.49
+		"price": "€1.99",
+		"price_value": 1.99
 	},
 	# Remove ads (non-consumable, one-time purchase)
 	"no_ads": {
@@ -195,8 +133,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": false,
 		"one_time": true,
-		"price": "$0.49",
-		"price_value": 0.49,
+		"price": "€0.99",
+		"price_value": 0.99,
 		"popular": true
 	},
 	# VIP subscriptions
@@ -210,7 +148,7 @@ var products: Dictionary = {
 		"duration_days": 7,
 		"coin_multiplier": 1.5,
 		"regen_reduction": 0.7,
-		"price": "$0.99",
+		"price": "€0.99",
 		"price_value": 0.99
 	},
 	"vip_month": {
@@ -223,7 +161,7 @@ var products: Dictionary = {
 		"duration_days": 30,
 		"coin_multiplier": 2.0,
 		"regen_reduction": 0.5,
-		"price": "$2.49",
+		"price": "€2.49",
 		"price_value": 2.49,
 		"best_value": true
 	},
