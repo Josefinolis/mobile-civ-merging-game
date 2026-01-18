@@ -185,7 +185,7 @@ func load_banner() -> void:
 	if ad_size.width == 0:
 		ad_size = _AdSize.BANNER
 
-	banner_ad = _AdView.new(BANNER_AD_UNIT_ID, ad_size, _AdPosition.Values.BOTTOM)
+	banner_ad = _AdView.new(BANNER_AD_UNIT_ID, ad_size, _AdPosition.Values.TOP)
 
 	# Set up callbacks
 	banner_ad.ad_listener.on_ad_loaded = _on_banner_loaded
