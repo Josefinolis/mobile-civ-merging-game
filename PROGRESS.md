@@ -54,7 +54,7 @@ python3 publish_to_play.py production
 - [x] Sistema de grid 5x7 para edificios
 - [x] Mecanica de drag & drop
 - [x] Logica de merge (fusion de edificios iguales)
-- [x] 10 niveles de edificios (Tent -> Wonder)
+- [x] 14 niveles de edificios (Tent -> Wonder)
 - [x] Sistema de energia (10 max, regenera cada 30s)
 - [x] Generacion pasiva de monedas
 - [x] Auto-guardado al cerrar

@@ -295,10 +295,6 @@ func _build_cabin_detailed(base_color: Color) -> void:
 	# Door handle
 	_rect(Vector2(38, 68), Vector2(3, 6), Color(0.7, 0.6, 0.3))
 
-	# Windows
-	_create_cabin_window(Vector2(55, 48), base_color)
-	_create_cabin_window(Vector2(55, 48), base_color)
-
 	# Window with warm glow
 	_rect(Vector2(55, 50), Vector2(24, 22), Color(0.25, 0.18, 0.1))
 	_rect(Vector2(57, 52), Vector2(20, 18), Color(0.95, 0.85, 0.5, 0.9))
@@ -309,9 +305,6 @@ func _build_cabin_detailed(base_color: Color) -> void:
 	_rect(Vector2(85, 72), Vector2(12, 14), Color(0.45, 0.32, 0.2))
 	_rect(Vector2(86, 74), Vector2(4, 10), Color(0.5, 0.35, 0.22))
 	_rect(Vector2(91, 74), Vector2(4, 10), Color(0.48, 0.33, 0.21))
-
-func _create_cabin_window(pos: Vector2, base_color: Color) -> void:
-	pass  # Implemented inline above
 
 # ==================== NIVEL 4: COTTAGE ====================
 func _build_cottage_detailed(base_color: Color) -> void:

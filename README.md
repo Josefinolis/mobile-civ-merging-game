@@ -16,18 +16,22 @@ A mobile merge game where you combine buildings to create a thriving city. Built
 |-------|----------|-----------|
 | 1 | Tent | 0.1 |
 | 2 | Hut | 0.3 |
-| 3 | Cabin | 0.8 |
-| 4 | House | 2.0 |
-| 5 | Villa | 5.0 |
-| 6 | Mansion | 12.0 |
-| 7 | Tower | 30.0 |
-| 8 | Skyscraper | 75.0 |
-| 9 | Monument | 200.0 |
-| 10 | Wonder | 500.0 |
+| 3 | Cabin | 0.7 |
+| 4 | Cottage | 1.5 |
+| 5 | House | 3.0 |
+| 6 | Villa | 6.0 |
+| 7 | Mansion | 12.0 |
+| 8 | Tower | 25.0 |
+| 9 | Skyscraper | 50.0 |
+| 10 | Castle | 100.0 |
+| 11 | Palace | 200.0 |
+| 12 | Citadel | 400.0 |
+| 13 | Monument | 800.0 |
+| 14 | Wonder | 2000.0 |
 
 ## Features
 
-- Merge mechanics with 10 building tiers
+- Merge mechanics with 14 building tiers
 - Passive coin generation
 - Energy system with regeneration
 - Quest system with rewards

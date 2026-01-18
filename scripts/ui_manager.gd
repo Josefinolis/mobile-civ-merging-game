@@ -421,33 +421,30 @@ func _on_settings_pressed() -> void:
 		tween.tween_property(settings_button, "rotation", 0.5, 0.2)
 		tween.tween_property(settings_button, "rotation", 0.0, 0.2)
 
-	_show_settings()
+	_show_panel(settings_panel, "settings")
 
-func _show_settings() -> void:
-	_active_panel = "settings"
-
+# Generic panel show/hide functions
+func _show_panel(panel: PanelContainer, panel_name: String) -> void:
+	_active_panel = panel_name
 	if settings_overlay:
 		settings_overlay.visible = true
 		settings_overlay.modulate.a = 0
 		var tween = settings_overlay.create_tween()
 		tween.tween_property(settings_overlay, "modulate:a", 1.0, 0.2)
+	if panel:
+		panel.show_panel()
 
-	if settings_panel:
-		settings_panel.show_panel()
-
-func _hide_settings() -> void:
+func _hide_panel(panel: PanelContainer) -> void:
 	if settings_overlay:
 		var tween = settings_overlay.create_tween()
 		tween.tween_property(settings_overlay, "modulate:a", 0.0, 0.15)
 		tween.tween_callback(func(): settings_overlay.visible = false)
-
-	if settings_panel:
-		settings_panel.hide_panel()
-
+	if panel:
+		panel.hide_panel()
 	_active_panel = ""
 
 func _on_settings_closed() -> void:
-	_hide_settings()
+	_hide_panel(settings_panel)
 
 func _on_overlay_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
@@ -457,130 +454,52 @@ func _on_overlay_input(event: InputEvent) -> void:
 # Shop panel functions
 func _on_shop_pressed() -> void:
 	AudioManager.play_button_click()
-
-	# Button animation
 	if shop_button:
 		var tween = shop_button.create_tween()
 		tween.tween_property(shop_button, "scale", Vector2(0.9, 0.9), 0.05)
 		tween.tween_property(shop_button, "scale", Vector2(1.05, 1.05), 0.1)
 		tween.tween_property(shop_button, "scale", Vector2(1.0, 1.0), 0.05)
-
-	_show_shop()
-
-func _show_shop() -> void:
-	_active_panel = "shop"
-
-	if settings_overlay:
-		settings_overlay.visible = true
-		settings_overlay.modulate.a = 0
-		var tween = settings_overlay.create_tween()
-		tween.tween_property(settings_overlay, "modulate:a", 1.0, 0.2)
-
-	if shop_panel:
-		shop_panel.show_panel()
-
-func _hide_shop() -> void:
-	if settings_overlay:
-		var tween = settings_overlay.create_tween()
-		tween.tween_property(settings_overlay, "modulate:a", 0.0, 0.15)
-		tween.tween_callback(func(): settings_overlay.visible = false)
-
-	if shop_panel:
-		shop_panel.hide_panel()
-
-	_active_panel = ""
+	_show_panel(shop_panel, "shop")
 
 func _on_shop_closed() -> void:
-	_hide_shop()
+	_hide_panel(shop_panel)
 
 # Daily reward panel functions
 func _on_daily_reward_pressed() -> void:
 	AudioManager.play_button_click()
-
-	# Button animation
 	if daily_reward_button:
 		var tween = daily_reward_button.create_tween()
 		tween.tween_property(daily_reward_button, "scale", Vector2(0.9, 0.9), 0.05)
 		tween.tween_property(daily_reward_button, "scale", Vector2(1.05, 1.05), 0.1)
 		tween.tween_property(daily_reward_button, "scale", Vector2(1.0, 1.0), 0.05)
-
-	_show_daily_reward()
-
-func _show_daily_reward() -> void:
-	_active_panel = "daily_reward"
-
-	if settings_overlay:
-		settings_overlay.visible = true
-		settings_overlay.modulate.a = 0
-		var tween = settings_overlay.create_tween()
-		tween.tween_property(settings_overlay, "modulate:a", 1.0, 0.2)
-
-	if daily_reward_panel:
-		daily_reward_panel.show_panel()
-
-func _hide_daily_reward() -> void:
-	if settings_overlay:
-		var tween = settings_overlay.create_tween()
-		tween.tween_property(settings_overlay, "modulate:a", 0.0, 0.15)
-		tween.tween_callback(func(): settings_overlay.visible = false)
-
-	if daily_reward_panel:
-		daily_reward_panel.hide_panel()
-
-	_active_panel = ""
+	_show_panel(daily_reward_panel, "daily_reward")
 
 func _on_daily_reward_closed() -> void:
-	_hide_daily_reward()
+	_hide_panel(daily_reward_panel)
 
 # IAP panel functions
 func _on_iap_pressed() -> void:
 	AudioManager.play_button_click()
-
-	# Button animation
 	if iap_button:
 		var tween = iap_button.create_tween()
 		tween.tween_property(iap_button, "scale", Vector2(0.9, 0.9), 0.05)
 		tween.tween_property(iap_button, "scale", Vector2(1.05, 1.05), 0.1)
 		tween.tween_property(iap_button, "scale", Vector2(1.0, 1.0), 0.05)
-
-	_show_iap()
-
-func _show_iap() -> void:
-	_active_panel = "iap"
-
-	if settings_overlay:
-		settings_overlay.visible = true
-		settings_overlay.modulate.a = 0
-		var tween = settings_overlay.create_tween()
-		tween.tween_property(settings_overlay, "modulate:a", 1.0, 0.2)
-
-	if iap_panel:
-		iap_panel.show_panel()
-
-func _hide_iap() -> void:
-	if settings_overlay:
-		var tween = settings_overlay.create_tween()
-		tween.tween_property(settings_overlay, "modulate:a", 0.0, 0.15)
-		tween.tween_callback(func(): settings_overlay.visible = false)
-
-	if iap_panel:
-		iap_panel.hide_panel()
-
-	_active_panel = ""
+	_show_panel(iap_panel, "iap")
 
 func _on_iap_closed() -> void:
-	_hide_iap()
+	_hide_panel(iap_panel)
 
 func _hide_active_panel() -> void:
 	match _active_panel:
 		"settings":
-			_hide_settings()
+			_hide_panel(settings_panel)
 		"shop":
-			_hide_shop()
+			_hide_panel(shop_panel)
 		"daily_reward":
-			_hide_daily_reward()
+			_hide_panel(daily_reward_panel)
 		"iap":
-			_hide_iap()
+			_hide_panel(iap_panel)
 
 # Update daily button to show notification when reward available
 func _update_daily_button_notification() -> void:
