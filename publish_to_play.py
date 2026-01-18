@@ -83,7 +83,9 @@ def publish_aab(track='internal'):
         print(f"   Version code: {version_code}")
 
         # 3. Asignar al track
-        print(f"3. Asignando a track '{track}'...")
+        # Usar 'draft' para apps no publicadas, 'completed' para apps publicadas
+        release_status = 'draft' if track == 'internal' else 'completed'
+        print(f"3. Asignando a track '{track}' (status: {release_status})...")
         service.edits().tracks().update(
             packageName=PACKAGE_NAME,
             editId=edit_id,
@@ -92,7 +94,7 @@ def publish_aab(track='internal'):
                 'track': track,
                 'releases': [{
                     'versionCodes': [version_code],
-                    'status': 'completed'
+                    'status': release_status
                 }]
             }
         ).execute()
