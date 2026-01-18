@@ -1,12 +1,12 @@
 extends PanelContainer
-## IAPPanel - In-App Purchase panel for buying coins, energy, and special packs
+## IAPPanel - In-App Purchase panel for buying boost products
 
 signal closed
 
 @onready var close_button: Button = $MarginContainer/VBox/Header/CloseButton
 @onready var coins_label: Label = $MarginContainer/VBox/Header/CoinsLabel
 @onready var products_container: VBoxContainer = $MarginContainer/VBox/ScrollContainer/ProductsContainer
-@onready var vip_status_label: Label = $MarginContainer/VBox/VIPStatus
+@onready var boost_status_label: Label = $MarginContainer/VBox/VIPStatus
 
 var product_items: Dictionary = {}
 
@@ -22,13 +22,19 @@ func _ready() -> void:
 	visible = false
 
 func _process(_delta: float) -> void:
-	# Update VIP status
-	if vip_status_label and visible:
-		if IAPManager.is_vip_active():
-			vip_status_label.text = "VIP Active: %s remaining" % IAPManager.get_vip_remaining_time()
-			vip_status_label.add_theme_color_override("font_color", Color.GOLD)
+	# Update active boosts status
+	if boost_status_label and visible:
+		var status_parts: Array = []
+		if IAPManager.is_coin_boost_active():
+			status_parts.append("x2 Money: %s" % IAPManager.get_coin_boost_remaining())
+		if IAPManager.is_energy_boost_active():
+			status_parts.append("x2 Energy: %s" % IAPManager.get_energy_boost_remaining())
+
+		if status_parts.size() > 0:
+			boost_status_label.text = " | ".join(status_parts)
+			boost_status_label.add_theme_color_override("font_color", Color.GOLD)
 		else:
-			vip_status_label.text = ""
+			boost_status_label.text = ""
 
 func _create_product_items() -> void:
 	for child in products_container.get_children():
@@ -36,39 +42,13 @@ func _create_product_items() -> void:
 
 	product_items.clear()
 
-	# Group products by type
-	var coin_products: Array = []
-	var energy_products: Array = []
-	var special_products: Array = []
+	# Add header for boosts
+	_add_section_header("POWER BOOSTS (24h)")
 
-	for product_id in IAPManager.get_all_products().keys():
-		var product = IAPManager.get_product(product_id)
-		match product.type:
-			IAPManager.ProductType.COINS:
-				coin_products.append(product_id)
-			IAPManager.ProductType.ENERGY:
-				energy_products.append(product_id)
-			_:
-				special_products.append(product_id)
-
-	# Add section headers and products
-	if special_products.size() > 0:
-		_add_section_header("SPECIAL OFFERS")
-		for product_id in special_products:
-			var item = _create_product_item(product_id)
-			products_container.add_child(item)
-			product_items[product_id] = item
-
-	if coin_products.size() > 0:
-		_add_section_header("COIN PACKS")
-		for product_id in coin_products:
-			var item = _create_product_item(product_id)
-			products_container.add_child(item)
-			product_items[product_id] = item
-
-	if energy_products.size() > 0:
-		_add_section_header("ENERGY")
-		for product_id in energy_products:
+	# Add all products in order
+	var product_order = ["boost_coins", "boost_energy", "super_power"]
+	for product_id in product_order:
+		if IAPManager.get_all_products().has(product_id):
 			var item = _create_product_item(product_id)
 			products_container.add_child(item)
 			product_items[product_id] = item
