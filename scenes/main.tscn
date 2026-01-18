@@ -344,27 +344,6 @@ flat = true
 [node name="Separator1" type="HSeparator" parent="SettingsPanel/MarginContainer/VBox"]
 layout_mode = 2
 
-[node name="MusicRow" type="HBoxContainer" parent="SettingsPanel/MarginContainer/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 15
-
-[node name="MusicLabel" type="Label" parent="SettingsPanel/MarginContainer/VBox/MusicRow"]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Music"
-
-[node name="MusicSlider" type="HSlider" parent="SettingsPanel/MarginContainer/VBox/MusicRow"]
-custom_minimum_size = Vector2(180, 30)
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 100.0
-value = 40.0
-
-[node name="MusicToggle" type="CheckButton" parent="SettingsPanel/MarginContainer/VBox/MusicRow"]
-layout_mode = 2
-button_pressed = true
-
 [node name="SFXRow" type="HBoxContainer" parent="SettingsPanel/MarginContainer/VBox"]
 layout_mode = 2
 theme_override_constants/separation = 15

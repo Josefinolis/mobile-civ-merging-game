@@ -15,9 +15,7 @@ func save_game() -> void:
 		"grid": _serialize_grid(),
 		"timestamp": Time.get_unix_time_from_system(),
 		# Audio settings
-		"music_enabled": AudioManager.is_music_enabled(),
 		"sfx_enabled": AudioManager.is_sfx_enabled(),
-		"music_volume": AudioManager.get_music_volume(),
 		"sfx_volume": AudioManager.get_sfx_volume(),
 		# Quest progress
 		"quest_total_builds": QuestManager.total_builds,
@@ -77,14 +75,9 @@ func load_game() -> void:
 	_deserialize_grid(grid_data)
 
 	# Restore audio settings
-	if save_data.has("music_enabled"):
-		if AudioManager.is_music_enabled() != save_data.get("music_enabled", true):
-			AudioManager.toggle_music()
 	if save_data.has("sfx_enabled"):
 		if AudioManager.is_sfx_enabled() != save_data.get("sfx_enabled", true):
 			AudioManager.toggle_sfx()
-	if save_data.has("music_volume"):
-		AudioManager.set_music_volume(save_data.get("music_volume", 0.4))
 	if save_data.has("sfx_volume"):
 		AudioManager.set_sfx_volume(save_data.get("sfx_volume", 0.7))
 

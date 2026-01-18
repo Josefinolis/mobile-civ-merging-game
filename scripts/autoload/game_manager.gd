@@ -121,18 +121,17 @@ func clear_building_at(pos: Vector2i) -> void:
 		grid[pos.x][pos.y] = 0
 
 func can_merge(level1: int, level2: int) -> bool:
-	return level1 == level2 and level1 > 0 and level1 < max_building_level
+	if level1 <= 0 or level2 <= 0:
+		return false
+	return level1 == level2 and level1 < max_building_level
 
 func merge_result(level: int) -> int:
-	if level < max_building_level:
-		var new_level: int = level + 1
-
-		# Check for critical merge (skip a level)
-		if ShopManager and ShopManager.roll_critical_merge():
-			new_level = min(level + 2, max_building_level)
-
-		return new_level
-	return level
+	if level <= 0 or level >= max_building_level:
+		return level
+	var new_level: int = level + 1
+	if ShopManager and ShopManager.roll_critical_merge():
+		new_level = min(level + 2, max_building_level)
+	return new_level
 
 func spawn_building() -> bool:
 	if energy <= 0:

@@ -1,16 +1,11 @@
 extends Node
-## AudioManager - Handles all game audio with pre-generated procedural sounds
+## AudioManager - Handles all game sound effects with pre-generated procedural sounds
 
 signal settings_changed
 
 # Audio players pool
 var sfx_players: Array[AudioStreamPlayer] = []
 const SFX_POOL_SIZE = 8
-
-# Music player
-var music_player: AudioStreamPlayer
-var music_enabled: bool = true
-var music_volume: float = 0.4
 
 # Sound settings
 var sfx_volume: float = 0.7
@@ -19,30 +14,17 @@ var master_enabled: bool = true
 
 # Cached sounds (pre-generated at startup)
 var _cached_sounds: Dictionary = {}
-var _cached_music: AudioStreamWAV
 
 func _ready() -> void:
-	# Pre-generate all sounds at startup to avoid lag
 	_pregenerate_sounds()
 
-	# Create pool of audio players for SFX
 	for i in range(SFX_POOL_SIZE):
 		var player = AudioStreamPlayer.new()
 		player.bus = "Master"
 		add_child(player)
 		sfx_players.append(player)
 
-	# Create music player
-	music_player = AudioStreamPlayer.new()
-	music_player.bus = "Master"
-	add_child(music_player)
-	music_player.finished.connect(_on_music_finished)
-
-	# Start background music after a short delay
-	call_deferred("_start_background_music")
-
 func _pregenerate_sounds() -> void:
-	# Generate all sounds once at startup
 	_cached_sounds["spawn"] = _generate_spawn_sound()
 	_cached_sounds["merge"] = _generate_merge_sound()
 	_cached_sounds["levelup"] = _generate_levelup_sound()
@@ -53,7 +35,6 @@ func _pregenerate_sounds() -> void:
 	_cached_sounds["coin"] = _generate_coin_sound()
 	_cached_sounds["quest_complete"] = _generate_quest_complete_sound()
 	_cached_sounds["achievement"] = _generate_achievement_sound()
-	_cached_music = _generate_ambient_music()
 
 func _get_available_player() -> AudioStreamPlayer:
 	for player in sfx_players:
@@ -541,107 +522,10 @@ func _generate_achievement_sound() -> AudioStreamWAV:
 	audio.data = data
 	return audio
 
-# === MUSIC ===
-
-func _start_background_music() -> void:
-	if music_enabled and music_player and _cached_music:
-		music_player.stream = _cached_music
-		music_player.volume_db = linear_to_db(music_volume * 0.5)
-		music_player.play()
-
-func _on_music_finished() -> void:
-	if music_enabled:
-		_start_background_music()
-
-func _generate_ambient_music() -> AudioStreamWAV:
-	var sample_rate = 22050
-	var duration = 30.0
-	var samples = int(duration * sample_rate)
-
-	var audio = AudioStreamWAV.new()
-	audio.mix_rate = sample_rate
-	audio.format = AudioStreamWAV.FORMAT_8_BITS
-	audio.stereo = false
-
-	var data = PackedByteArray()
-	data.resize(samples)
-
-	# Relaxing chord progression
-	var chords = [
-		[261.63, 329.63, 392.00],  # C major
-		[220.00, 277.18, 329.63],  # A minor
-		[246.94, 311.13, 369.99],  # B dim (softer)
-		[196.00, 246.94, 293.66],  # G major
-	]
-
-	var chord_duration = duration / chords.size()
-	var samples_per_chord = int(chord_duration * sample_rate)
-
-	for i in range(samples):
-		var t = float(i) / sample_rate
-		var overall_progress = float(i) / samples
-
-		var chord_index = int(i / samples_per_chord) % chords.size()
-		var chord = chords[chord_index]
-		var chord_progress = fmod(float(i), samples_per_chord) / samples_per_chord
-
-		var sample = 0.0
-		for j in range(chord.size()):
-			var freq = chord[j]
-			var detune = sin(t * 0.1 + j) * 1.5
-			var tremolo = 0.85 + 0.15 * sin(t * (0.3 + j * 0.05))
-			sample += sin(t * (freq + detune) * TAU) * tremolo
-
-		sample = sample / chord.size()
-
-		# Sub bass
-		var bass_freq = chord[0] / 2.0
-		sample += sin(t * bass_freq * TAU) * 0.25
-
-		# Chord transition envelope
-		var envelope = 1.0
-		if chord_progress < 0.1:
-			envelope = chord_progress / 0.1
-		elif chord_progress > 0.9:
-			envelope = (1.0 - chord_progress) / 0.1
-		envelope = smoothstep(0.0, 1.0, envelope)
-
-		# Master envelope
-		var master_env = 1.0
-		if overall_progress < 0.05:
-			master_env = overall_progress / 0.05
-		elif overall_progress > 0.95:
-			master_env = (1.0 - overall_progress) / 0.05
-
-		sample = sample * envelope * master_env * 0.25
-
-		data[i] = int(clamp((sample * 0.5 + 0.5) * 255, 0, 255))
-
-	audio.data = data
-	return audio
-
-func smoothstep(edge0: float, edge1: float, x: float) -> float:
-	var t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0)
-	return t * t * (3.0 - 2.0 * t)
-
 # === SETTINGS ===
-
-func set_music_volume(volume: float) -> void:
-	music_volume = clamp(volume, 0.0, 1.0)
-	if music_player:
-		music_player.volume_db = linear_to_db(music_volume * 0.5)
-	settings_changed.emit()
 
 func set_sfx_volume(volume: float) -> void:
 	sfx_volume = clamp(volume, 0.0, 1.0)
-	settings_changed.emit()
-
-func toggle_music() -> void:
-	music_enabled = not music_enabled
-	if music_enabled:
-		_start_background_music()
-	elif music_player:
-		music_player.stop()
 	settings_changed.emit()
 
 func toggle_sfx() -> void:
@@ -650,22 +534,10 @@ func toggle_sfx() -> void:
 
 func toggle_sound() -> void:
 	master_enabled = not master_enabled
-	if not master_enabled:
-		if music_player:
-			music_player.stop()
-	else:
-		if music_enabled:
-			_start_background_music()
 	settings_changed.emit()
-
-func get_music_volume() -> float:
-	return music_volume
 
 func get_sfx_volume() -> float:
 	return sfx_volume
-
-func is_music_enabled() -> bool:
-	return music_enabled
 
 func is_sfx_enabled() -> bool:
 	return sfx_enabled
