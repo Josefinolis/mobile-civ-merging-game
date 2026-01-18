@@ -6,7 +6,7 @@ El juego esta publicado en Google Play para pruebas internas. Listo para producc
 
 ## Repositorio
 - **URL**: https://github.com/Josefinolis/mobile-civ-merging-game
-- **Ultima version**: v1.3.0
+- **Ultima version**: v1.4.0
 - **Release**: https://github.com/Josefinolis/mobile-civ-merging-game/releases
 
 ---
@@ -16,7 +16,7 @@ El juego esta publicado en Google Play para pruebas internas. Listo para producc
 ### Estado
 - **App**: Merge Town
 - **Package**: com.mergetowngame.app
-- **Version actual**: 1.0.0 (Version Code 7)
+- **Version actual**: 1.4.0 (Version Code 16)
 - **Track**: Pruebas internas (completado)
 - **Produccion**: Pendiente
 
@@ -70,8 +70,7 @@ python3 publish_to_play.py production
 
 ### Audio
 - [x] Efectos de sonido procedurales
-- [x] Musica de fondo ambiental
-- [x] Controles de volumen (music/SFX)
+- [x] Control de volumen SFX
 - [x] Persistencia de preferencias de audio
 
 ### Quest System
@@ -97,11 +96,10 @@ python3 publish_to_play.py production
 #### In-App Purchases (Google Play Billing)
 - [x] Integracion con Google Play Billing Library
 - [x] Deteccion automatica de entorno
-- [x] 5 paquetes de monedas ($0.99 - $19.99)
-- [x] 3 paquetes de energia ($0.99 - $2.99)
-- [x] Bundles especiales (Starter Pack, Pro Pack)
-- [x] Suscripciones VIP (semanal y mensual)
-- [x] Opcion "Remove Ads" ($2.99)
+- [x] 3 productos de boost temporal (24h):
+  - x2 Money (€0.75) - duplica ganancias de monedas
+  - x2 Energy (€0.75) - duplica regeneracion de energia
+  - Super Power (€0.99) - ambos boosts combinados
 
 #### Publicidad (AdMob)
 - [x] Integracion con AdMob
@@ -195,6 +193,7 @@ python3 publish_to_play.py internal
 | v1.1.1 | 2026-01-07 | Mejora visual: edificios detallados |
 | v1.1.2 | 2026-01-07 | Edificios centrados y escalados |
 | v1.3.0 | 2026-01-09 | Monetizacion: IAP + AdMob |
+| v1.4.0 | 2026-01-18 | Simplificacion IAP (3 boosts), eliminar musica, banner en parte inferior |
 
 ---
 
