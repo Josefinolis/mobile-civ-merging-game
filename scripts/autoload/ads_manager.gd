@@ -1,5 +1,5 @@
 extends Node
-## AdsManager - Handles advertisements with AdMob
+## AdsManager - Handles advertisements with AdMob (Poing Studios Plugin)
 ##
 ## AD MODE (automatic detection):
 ## - Editor/Desktop: Always SIMULATED (no real ads)
@@ -7,12 +7,6 @@ extends Node
 ## - Android with plugin: REAL ads (AdMob)
 ##
 ## To force simulation mode even on Android, set FORCE_SIMULATE = true
-##
-## SETUP INSTRUCTIONS:
-## 1. Run ./setup_ads.sh to download the official AdMob plugin
-## 2. Plugin extracts to: android/plugins/GodotAdMob/
-## 3. Enable in Project Settings > Plugins > Godot AdMob
-## 4. Configure ad units in AdMob Console (see ADMOB_SETUP.md)
 
 signal banner_loaded()
 signal banner_failed(error: String)
@@ -28,9 +22,8 @@ signal rewarded_closed()
 # Set to true to ALWAYS use simulated ads (even on Android with plugin)
 const FORCE_SIMULATE: bool = false
 
-# AdMob App ID (production)
+# AdMob App ID (configured in AndroidManifest.xml)
 const ADMOB_APP_ID_ANDROID: String = "ca-app-pub-9924441769526161~3498220200"
-const ADMOB_APP_ID_IOS: String = "ca-app-pub-3940256099942544~1458002511"  # Test ID (no iOS yet)
 
 # Ad Unit IDs (production)
 const BANNER_AD_UNIT_ID: String = "ca-app-pub-9924441769526161/4001439626"
@@ -47,9 +40,27 @@ enum AdMode {
 }
 var current_ad_mode: AdMode = AdMode.SIMULATED
 
-# AdMob plugin reference
-var admob_plugin = null
+# Plugin state
 var is_ads_supported: bool = false
+var is_initialized: bool = false
+
+# Ad objects - dynamically loaded to avoid parse errors
+var banner_ad = null
+var current_interstitial = null
+var current_rewarded = null
+
+# Addon classes - loaded dynamically
+var _AdView = null
+var _AdSize = null
+var _AdPosition = null
+var _AdRequest = null
+var _MobileAds = null
+var _InterstitialAdLoader = null
+var _InterstitialAdLoadCallback = null
+var _RewardedAdLoader = null
+var _RewardedAdLoadCallback = null
+var _OnInitializationCompleteListener = null
+var _OnUserEarnedRewardListener = null
 
 # Ad states
 var is_banner_loaded: bool = false
@@ -75,21 +86,44 @@ func _process(delta: float) -> void:
 	if interstitial_cooldown > 0:
 		interstitial_cooldown -= delta
 
+func _load_addon_classes() -> bool:
+	"""Load AdMob addon classes dynamically. Returns true if successful."""
+	var base_path = "res://addons/admob/src/"
+
+	_AdView = load(base_path + "api/AdView.gd")
+	_AdSize = load(base_path + "api/core/AdSize.gd")
+	_AdPosition = load(base_path + "api/core/AdPosition.gd")
+	_AdRequest = load(base_path + "api/core/AdRequest.gd")
+	_MobileAds = load(base_path + "api/MobileAds.gd")
+	_InterstitialAdLoader = load(base_path + "api/InterstitialAdLoader.gd")
+	_InterstitialAdLoadCallback = load(base_path + "api/listeners/InterstitialAdLoadCallback.gd")
+	_RewardedAdLoader = load(base_path + "api/RewardedAdLoader.gd")
+	_RewardedAdLoadCallback = load(base_path + "api/listeners/RewardedAdLoadCallback.gd")
+	_OnInitializationCompleteListener = load(base_path + "api/listeners/OnInitializationCompleteListener.gd")
+	_OnUserEarnedRewardListener = load(base_path + "api/listeners/OnUserEarnedRewardListener.gd")
+
+	return _AdView != null and _MobileAds != null
+
 func _initialize_ads() -> void:
 	current_ad_mode = _determine_ad_mode()
 
 	if current_ad_mode == AdMode.REAL:
-		# Try to load AdMob plugin
-		if Engine.has_singleton("AdMob"):
-			admob_plugin = Engine.get_singleton("AdMob")
-			is_ads_supported = true
-			_setup_admob()
-			print("[ADS] AdMob initialized - REAL ads enabled")
+		# Check if Poing Studios AdMob plugin is available
+		if Engine.has_singleton("PoingGodotAdMob"):
+			if _load_addon_classes():
+				is_ads_supported = true
+				_setup_admob()
+				print("[ADS] Poing AdMob initialized - REAL ads enabled")
+			else:
+				current_ad_mode = AdMode.SIMULATED
+				is_ads_supported = false
+				print("[ADS] WARNING: Could not load AdMob addon classes, falling back to SIMULATED")
 		else:
 			# Fallback to simulated
 			current_ad_mode = AdMode.SIMULATED
 			is_ads_supported = false
-			print("[ADS] WARNING: AdMob singleton not found, falling back to SIMULATED")
+			print("[ADS] WARNING: PoingGodotAdMob singleton not found, falling back to SIMULATED")
+			print("[ADS] Make sure 'AdMob' plugin is enabled in Android export settings")
 	else:
 		is_ads_supported = false
 		print("[ADS] Running in SIMULATED mode - no real ads")
@@ -118,52 +152,18 @@ func _get_simulation_reason() -> String:
 	return "Unknown platform"
 
 func _setup_admob() -> void:
-	if admob_plugin == null:
-		return
+	# Initialize MobileAds using the addon classes
+	var init_listener = _OnInitializationCompleteListener.new()
+	init_listener.on_initialization_complete = _on_admob_initialized
+	_MobileAds.initialize(init_listener)
 
-	# Initialize AdMob
-	var app_id = ADMOB_APP_ID_ANDROID
-	if OS.has_feature("ios"):
-		app_id = ADMOB_APP_ID_IOS
-
-	# Configure and initialize
-	admob_plugin.initialize()
-
-	# Connect signals
-	_connect_admob_signals()
-
+func _on_admob_initialized(_status) -> void:
+	is_initialized = true
+	print("[ADS] AdMob SDK initialized")
 	# Preload ads
 	load_banner()
 	load_interstitial()
 	load_rewarded()
-
-func _connect_admob_signals() -> void:
-	if admob_plugin == null:
-		return
-
-	# Banner signals
-	if admob_plugin.has_signal("banner_loaded"):
-		admob_plugin.banner_loaded.connect(_on_banner_loaded)
-	if admob_plugin.has_signal("banner_failed_to_load"):
-		admob_plugin.banner_failed_to_load.connect(_on_banner_failed)
-
-	# Interstitial signals
-	if admob_plugin.has_signal("interstitial_loaded"):
-		admob_plugin.interstitial_loaded.connect(_on_interstitial_loaded)
-	if admob_plugin.has_signal("interstitial_failed_to_load"):
-		admob_plugin.interstitial_failed_to_load.connect(_on_interstitial_failed)
-	if admob_plugin.has_signal("interstitial_closed"):
-		admob_plugin.interstitial_closed.connect(_on_interstitial_closed)
-
-	# Rewarded signals
-	if admob_plugin.has_signal("rewarded_ad_loaded"):
-		admob_plugin.rewarded_ad_loaded.connect(_on_rewarded_loaded)
-	if admob_plugin.has_signal("rewarded_ad_failed_to_load"):
-		admob_plugin.rewarded_ad_failed_to_load.connect(_on_rewarded_failed)
-	if admob_plugin.has_signal("rewarded_ad_closed"):
-		admob_plugin.rewarded_ad_closed.connect(_on_rewarded_closed)
-	if admob_plugin.has_signal("user_earned_reward"):
-		admob_plugin.user_earned_reward.connect(_on_user_earned_reward)
 
 # ============= BANNER ADS =============
 
@@ -177,8 +177,23 @@ func load_banner() -> void:
 		print("[ADS] SIMULATED: Banner loaded")
 		return
 
-	if admob_plugin:
-		admob_plugin.load_banner(BANNER_AD_UNIT_ID, "BOTTOM", "ADAPTIVE_BANNER")
+	if not is_ads_supported:
+		return
+
+	# Create banner ad using addon classes
+	var ad_size = _AdSize.get_current_orientation_anchored_adaptive_banner_ad_size(_AdSize.FULL_WIDTH)
+	if ad_size.width == 0:
+		ad_size = _AdSize.BANNER
+
+	banner_ad = _AdView.new(BANNER_AD_UNIT_ID, ad_size, _AdPosition.Values.BOTTOM)
+
+	# Set up callbacks
+	banner_ad.ad_listener.on_ad_loaded = _on_banner_loaded
+	banner_ad.ad_listener.on_ad_failed_to_load = _on_banner_failed
+
+	# Load the ad
+	var ad_request = _AdRequest.new()
+	banner_ad.load_ad(ad_request)
 
 func show_banner() -> void:
 	if ads_removed:
@@ -189,8 +204,8 @@ func show_banner() -> void:
 		print("[ADS] SIMULATED: Banner shown")
 		return
 
-	if admob_plugin and is_banner_loaded:
-		admob_plugin.show_banner()
+	if banner_ad and is_banner_loaded:
+		banner_ad.show()
 		is_banner_visible = true
 
 func hide_banner() -> void:
@@ -199,8 +214,8 @@ func hide_banner() -> void:
 		print("[ADS] SIMULATED: Banner hidden")
 		return
 
-	if admob_plugin:
-		admob_plugin.hide_banner()
+	if banner_ad:
+		banner_ad.hide()
 		is_banner_visible = false
 
 func _on_banner_loaded() -> void:
@@ -208,10 +223,11 @@ func _on_banner_loaded() -> void:
 	banner_loaded.emit()
 	print("[ADS] Banner loaded")
 
-func _on_banner_failed(error_code: int) -> void:
+func _on_banner_failed(error) -> void:
 	is_banner_loaded = false
-	banner_failed.emit("Error code: %d" % error_code)
-	print("[ADS] Banner failed to load: %d" % error_code)
+	var error_msg = "Error code: %d" % error.code if error else "Unknown error"
+	banner_failed.emit(error_msg)
+	print("[ADS] Banner failed to load: %s" % error_msg)
 
 # ============= INTERSTITIAL ADS =============
 
@@ -225,8 +241,32 @@ func load_interstitial() -> void:
 		print("[ADS] SIMULATED: Interstitial loaded")
 		return
 
-	if admob_plugin:
-		admob_plugin.load_interstitial(INTERSTITIAL_AD_UNIT_ID)
+	if not is_ads_supported:
+		return
+
+	var loader = _InterstitialAdLoader.new()
+	var ad_request = _AdRequest.new()
+
+	var callback = _InterstitialAdLoadCallback.new()
+	callback.on_ad_loaded = _on_interstitial_ad_loaded
+	callback.on_ad_failed_to_load = _on_interstitial_ad_failed
+
+	loader.load(INTERSTITIAL_AD_UNIT_ID, ad_request, callback)
+
+func _on_interstitial_ad_loaded(ad) -> void:
+	current_interstitial = ad
+	is_interstitial_loaded = true
+	interstitial_loaded.emit()
+	print("[ADS] Interstitial loaded")
+
+	# Set up full screen callbacks
+	ad.full_screen_content_callback.on_ad_dismissed_full_screen_content = _on_interstitial_closed
+
+func _on_interstitial_ad_failed(error) -> void:
+	is_interstitial_loaded = false
+	var error_msg = "Error code: %d" % error.code if error else "Unknown error"
+	interstitial_failed.emit(error_msg)
+	print("[ADS] Interstitial failed to load: %s" % error_msg)
 
 func show_interstitial() -> bool:
 	"""Shows interstitial ad. Returns true if shown, false if not ready or on cooldown."""
@@ -245,8 +285,8 @@ func show_interstitial() -> bool:
 		_simulate_interstitial_close()
 		return true
 
-	if admob_plugin and is_interstitial_loaded:
-		admob_plugin.show_interstitial()
+	if current_interstitial and is_interstitial_loaded:
+		current_interstitial.show()
 		interstitial_cooldown = INTERSTITIAL_COOLDOWN_SECONDS
 		return true
 
@@ -269,19 +309,10 @@ func try_show_interstitial_after_game() -> void:
 		if show_interstitial():
 			games_since_last_interstitial = 0
 
-func _on_interstitial_loaded() -> void:
-	is_interstitial_loaded = true
-	interstitial_loaded.emit()
-	print("[ADS] Interstitial loaded")
-
-func _on_interstitial_failed(error_code: int) -> void:
-	is_interstitial_loaded = false
-	interstitial_failed.emit("Error code: %d" % error_code)
-	print("[ADS] Interstitial failed to load: %d" % error_code)
-
 func _on_interstitial_closed() -> void:
 	interstitial_closed.emit()
 	is_interstitial_loaded = false
+	current_interstitial = null
 	print("[ADS] Interstitial closed")
 	# Preload next interstitial
 	load_interstitial()
@@ -295,8 +326,32 @@ func load_rewarded() -> void:
 		print("[ADS] SIMULATED: Rewarded ad loaded")
 		return
 
-	if admob_plugin:
-		admob_plugin.load_rewarded_ad(REWARDED_AD_UNIT_ID)
+	if not is_ads_supported:
+		return
+
+	var loader = _RewardedAdLoader.new()
+	var ad_request = _AdRequest.new()
+
+	var callback = _RewardedAdLoadCallback.new()
+	callback.on_ad_loaded = _on_rewarded_ad_loaded
+	callback.on_ad_failed_to_load = _on_rewarded_ad_failed
+
+	loader.load(REWARDED_AD_UNIT_ID, ad_request, callback)
+
+func _on_rewarded_ad_loaded(ad) -> void:
+	current_rewarded = ad
+	is_rewarded_loaded = true
+	rewarded_loaded.emit()
+	print("[ADS] Rewarded ad loaded")
+
+	# Set up full screen callbacks
+	ad.full_screen_content_callback.on_ad_dismissed_full_screen_content = _on_rewarded_closed
+
+func _on_rewarded_ad_failed(error) -> void:
+	is_rewarded_loaded = false
+	var error_msg = "Error code: %d" % error.code if error else "Unknown error"
+	rewarded_failed.emit(error_msg)
+	print("[ADS] Rewarded ad failed to load: %s" % error_msg)
 
 func is_rewarded_ad_ready() -> bool:
 	return is_rewarded_loaded
@@ -309,8 +364,10 @@ func show_rewarded_ad() -> bool:
 		_simulate_rewarded_complete()
 		return true
 
-	if admob_plugin and is_rewarded_loaded:
-		admob_plugin.show_rewarded_ad()
+	if current_rewarded and is_rewarded_loaded:
+		var reward_listener = _OnUserEarnedRewardListener.new()
+		reward_listener.on_user_earned_reward = _on_user_earned_reward
+		current_rewarded.show(reward_listener)
 		return true
 
 	print("[ADS] Rewarded ad not ready")
@@ -325,25 +382,16 @@ func _simulate_rewarded_complete() -> void:
 	is_rewarded_loaded = false
 	load_rewarded()  # Preload next
 
-func _on_rewarded_loaded() -> void:
-	is_rewarded_loaded = true
-	rewarded_loaded.emit()
-	print("[ADS] Rewarded ad loaded")
-
-func _on_rewarded_failed(error_code: int) -> void:
-	is_rewarded_loaded = false
-	rewarded_failed.emit("Error code: %d" % error_code)
-	print("[ADS] Rewarded ad failed to load: %d" % error_code)
-
 func _on_rewarded_closed() -> void:
 	rewarded_closed.emit()
 	is_rewarded_loaded = false
+	current_rewarded = null
 	print("[ADS] Rewarded ad closed")
 	# Preload next rewarded ad
 	load_rewarded()
 
-func _on_user_earned_reward(reward_type: String, reward_amount: int) -> void:
-	print("[ADS] User earned reward: %s x%d" % [reward_type, reward_amount])
+func _on_user_earned_reward(reward_item) -> void:
+	print("[ADS] User earned reward: %s x%d" % [reward_item.type, reward_item.amount])
 	_grant_reward("energy", REWARDED_ENERGY_AMOUNT)
 	rewarded_earned.emit("energy", REWARDED_ENERGY_AMOUNT)
 
@@ -366,6 +414,9 @@ func remove_ads() -> void:
 	"""Called when user purchases 'no_ads' product."""
 	ads_removed = true
 	hide_banner()
+	if banner_ad:
+		banner_ad.destroy()
+		banner_ad = null
 	print("[ADS] Ads have been removed")
 
 func are_ads_removed() -> bool:
