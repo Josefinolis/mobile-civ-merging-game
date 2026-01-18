@@ -67,8 +67,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": 300,
-		"price": "$0.99",
-		"price_value": 0.99
+		"price": "$0.49",
+		"price_value": 0.49
 	},
 	"coins_small": {
 		"name": "Coin Bag",
@@ -78,8 +78,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": 800,
-		"price": "$1.99",
-		"price_value": 1.99,
+		"price": "$0.49",
+		"price_value": 0.49,
 		"bonus": "+33% value"
 	},
 	"coins_medium": {
@@ -90,8 +90,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": 2500,
-		"price": "$4.99",
-		"price_value": 4.99,
+		"price": "$0.99",
+		"price_value": 0.99,
 		"bonus": "+65% value",
 		"popular": true
 	},
@@ -103,8 +103,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": 6000,
-		"price": "$9.99",
-		"price_value": 9.99,
+		"price": "$2.49",
+		"price_value": 2.49,
 		"bonus": "+100% value"
 	},
 	"coins_mega": {
@@ -115,8 +115,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": 15000,
-		"price": "$19.99",
-		"price_value": 19.99,
+		"price": "$4.99",
+		"price_value": 4.99,
 		"bonus": "+150% value",
 		"best_value": true
 	},
@@ -129,8 +129,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": 15,
-		"price": "$0.99",
-		"price_value": 0.99
+		"price": "$0.49",
+		"price_value": 0.49
 	},
 	"energy_medium": {
 		"name": "Energy Pack",
@@ -140,8 +140,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": 40,
-		"price": "$1.99",
-		"price_value": 1.99,
+		"price": "$0.49",
+		"price_value": 0.49,
 		"bonus": "+33% value"
 	},
 	"energy_full": {
@@ -152,8 +152,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
 		"amount": -1,  # Special: fills to max + 10
-		"price": "$2.99",
-		"price_value": 2.99,
+		"price": "$0.49",
+		"price_value": 0.49,
 		"popular": true
 	},
 	# Special packs (non-consumable, one-time purchase)
@@ -168,8 +168,8 @@ var products: Dictionary = {
 		"coins": 2000,
 		"energy": 30,
 		"coin_boost_minutes": 30,
-		"price": "$2.99",
-		"price_value": 2.99,
+		"price": "$0.49",
+		"price_value": 0.49,
 		"best_value": true
 	},
 	"pro_pack": {
@@ -183,8 +183,8 @@ var products: Dictionary = {
 		"coins": 5000,
 		"energy": 50,
 		"coin_boost_minutes": 60,
-		"price": "$6.99",
-		"price_value": 6.99
+		"price": "$1.49",
+		"price_value": 1.49
 	},
 	# Remove ads (non-consumable, one-time purchase)
 	"no_ads": {
@@ -195,8 +195,8 @@ var products: Dictionary = {
 		"billing_type": BillingType.INAPP,
 		"consumable": false,
 		"one_time": true,
-		"price": "$2.99",
-		"price_value": 2.99,
+		"price": "$0.49",
+		"price_value": 0.49,
 		"popular": true
 	},
 	# VIP subscriptions
@@ -210,8 +210,8 @@ var products: Dictionary = {
 		"duration_days": 7,
 		"coin_multiplier": 1.5,
 		"regen_reduction": 0.7,
-		"price": "$3.99",
-		"price_value": 3.99
+		"price": "$0.99",
+		"price_value": 0.99
 	},
 	"vip_month": {
 		"name": "VIP Month",
@@ -223,8 +223,8 @@ var products: Dictionary = {
 		"duration_days": 30,
 		"coin_multiplier": 2.0,
 		"regen_reduction": 0.5,
-		"price": "$9.99",
-		"price_value": 9.99,
+		"price": "$2.49",
+		"price_value": 2.49,
 		"best_value": true
 	},
 }
