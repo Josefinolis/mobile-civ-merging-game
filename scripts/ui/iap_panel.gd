@@ -37,10 +37,17 @@ func _process(_delta: float) -> void:
 			boost_status_label.text = ""
 
 func _create_product_items() -> void:
+	if not products_container:
+		print("[IAP Panel] ERROR: products_container is null")
+		return
+
 	for child in products_container.get_children():
 		child.queue_free()
 
 	product_items.clear()
+
+	var all_products = IAPManager.get_all_products()
+	print("[IAP Panel] Products available: ", all_products.keys())
 
 	# Add header for boosts
 	_add_section_header("POWER BOOSTS (24h)")
@@ -48,10 +55,13 @@ func _create_product_items() -> void:
 	# Add all products in order
 	var product_order = ["boost_coins", "boost_energy", "super_power"]
 	for product_id in product_order:
-		if IAPManager.get_all_products().has(product_id):
+		if all_products.has(product_id):
 			var item = _create_product_item(product_id)
 			products_container.add_child(item)
 			product_items[product_id] = item
+			print("[IAP Panel] Added product: ", product_id)
+
+	print("[IAP Panel] Total items created: ", product_items.size())
 
 func _add_section_header(title: String) -> void:
 	var label = Label.new()
@@ -228,6 +238,7 @@ func _update_all_items() -> void:
 		coins_label.text = "%d" % GameManager.coins
 
 func show_panel() -> void:
+	print("[IAP Panel] show_panel called, items: ", product_items.size())
 	_update_all_items()
 	visible = true
 
