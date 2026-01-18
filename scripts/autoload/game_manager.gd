@@ -68,7 +68,11 @@ func _initialize_grid() -> void:
 
 func _process_energy_regen(delta: float) -> void:
 	if energy < max_energy:
-		_energy_timer += delta
+		# Apply energy regen multiplier from IAP boost (x2 = twice as fast)
+		var regen_multiplier: float = 1.0
+		if IAPManager:
+			regen_multiplier = IAPManager.get_energy_regen_multiplier()
+		_energy_timer += delta * regen_multiplier
 		if _energy_timer >= energy_regen_time:
 			_energy_timer = 0.0
 			energy += 1
@@ -89,7 +93,7 @@ func _process_coin_generation(delta: float) -> void:
 		if DailyRewardManager:
 			coin_multiplier *= DailyRewardManager.get_active_coin_bonus()
 		if IAPManager:
-			coin_multiplier *= IAPManager.get_vip_coin_multiplier()
+			coin_multiplier *= IAPManager.get_coin_multiplier()
 
 		coins_to_add *= coin_multiplier
 
@@ -178,6 +182,6 @@ func get_coins_per_second() -> float:
 	if DailyRewardManager:
 		coin_multiplier *= DailyRewardManager.get_active_coin_bonus()
 	if IAPManager:
-		coin_multiplier *= IAPManager.get_vip_coin_multiplier()
+		coin_multiplier *= IAPManager.get_coin_multiplier()
 
 	return total * coin_multiplier

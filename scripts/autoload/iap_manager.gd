@@ -23,12 +23,7 @@ signal billing_disconnected()
 
 # Product types
 enum ProductType {
-	COINS,          # Consumable - Coin packs
-	ENERGY,         # Consumable - Energy refills
-	GEMS,           # Consumable - Premium currency (for future use)
-	STARTER_PACK,   # Non-consumable - One-time starter bundle
-	NO_ADS,         # Non-consumable - Remove ads (future use)
-	VIP,            # Subscription - VIP benefits
+	BOOST,          # Consumable - Temporary boosts (coins, energy, or both)
 }
 
 # Google Play Billing types
@@ -58,111 +53,45 @@ var is_connected: bool = false
 # Product definitions with Google Play product IDs
 # IMPORTANT: These IDs must match exactly in Google Play Console
 var products: Dictionary = {
-	# Energy packs (consumable)
-	"energy_small": {
-		"name": "Energy Drink",
-		"description": "+15 energy",
-		"icon": "⚡",
-		"type": ProductType.ENERGY,
+	# Boost products (consumable, 24-hour duration)
+	"boost_coins": {
+		"name": "x2 Money",
+		"description": "+100% coins for 24h",
+		"icon": "💰",
+		"type": ProductType.BOOST,
 		"billing_type": BillingType.INAPP,
 		"consumable": true,
-		"amount": 15,
-		"price": "€0.49",
-		"price_value": 0.49
-	},
-	"energy_medium": {
-		"name": "Energy Pack",
-		"description": "+40 energy",
-		"icon": "⚡⚡",
-		"type": ProductType.ENERGY,
-		"billing_type": BillingType.INAPP,
-		"consumable": true,
-		"amount": 40,
-		"price": "€0.99",
-		"price_value": 0.99,
-		"bonus": "+33% value"
-	},
-	"energy_full": {
-		"name": "Full Recharge",
-		"description": "Max energy + 10 extra",
-		"icon": "🔋",
-		"type": ProductType.ENERGY,
-		"billing_type": BillingType.INAPP,
-		"consumable": true,
-		"amount": -1,  # Special: fills to max + 10
-		"price": "€1.49",
-		"price_value": 1.49,
-		"popular": true
-	},
-	# Special packs (non-consumable, one-time purchase)
-	"starter_pack": {
-		"name": "Starter Bundle",
-		"description": "2,000 coins + 30 energy + x2 coins 30min",
-		"icon": "🎁",
-		"type": ProductType.STARTER_PACK,
-		"billing_type": BillingType.INAPP,
-		"consumable": false,
-		"one_time": true,
-		"coins": 2000,
-		"energy": 30,
-		"coin_boost_minutes": 30,
-		"price": "€0.99",
-		"price_value": 0.99,
-		"best_value": true
-	},
-	"pro_pack": {
-		"name": "Pro Bundle",
-		"description": "5,000 coins + 50 energy + x2 coins 1hr",
-		"icon": "🎁🎁",
-		"type": ProductType.STARTER_PACK,
-		"billing_type": BillingType.INAPP,
-		"consumable": false,
-		"one_time": true,
-		"coins": 5000,
-		"energy": 50,
-		"coin_boost_minutes": 60,
-		"price": "€1.99",
-		"price_value": 1.99
-	},
-	# Remove ads (non-consumable, one-time purchase)
-	"no_ads": {
-		"name": "Remove Ads",
-		"description": "Remove all banner and interstitial ads forever",
-		"icon": "🚫",
-		"type": ProductType.NO_ADS,
-		"billing_type": BillingType.INAPP,
-		"consumable": false,
-		"one_time": true,
-		"price": "€0.99",
-		"price_value": 0.99,
-		"popular": true
-	},
-	# VIP subscriptions
-	"vip_week": {
-		"name": "VIP Week",
-		"description": "x1.5 coins + -30% regen, 7 days",
-		"icon": "👑",
-		"type": ProductType.VIP,
-		"billing_type": BillingType.SUBS,
-		"consumable": false,
-		"duration_days": 7,
-		"coin_multiplier": 1.5,
-		"regen_reduction": 0.7,
-		"price": "€0.99",
-		"price_value": 0.99
-	},
-	"vip_month": {
-		"name": "VIP Month",
-		"description": "x2 coins + -50% regen, 30 days",
-		"icon": "👑👑",
-		"type": ProductType.VIP,
-		"billing_type": BillingType.SUBS,
-		"consumable": false,
-		"duration_days": 30,
+		"duration_hours": 24,
 		"coin_multiplier": 2.0,
-		"regen_reduction": 0.5,
-		"price": "€2.49",
-		"price_value": 2.49,
+		"energy_multiplier": 1.0,
+		"price": "€0.75",
+		"price_value": 0.75
+	},
+	"boost_energy": {
+		"name": "x2 Energy",
+		"description": "+100% energy regen for 24h",
+		"icon": "⚡",
+		"type": ProductType.BOOST,
+		"billing_type": BillingType.INAPP,
+		"consumable": true,
+		"duration_hours": 24,
+		"coin_multiplier": 1.0,
+		"energy_multiplier": 2.0,
+		"price": "€0.75",
+		"price_value": 0.75
+	},
+	"super_power": {
+		"name": "Super Power",
+		"description": "x2 money + x2 energy for 24h",
+		"icon": "⭐",
+		"type": ProductType.BOOST,
+		"billing_type": BillingType.INAPP,
+		"consumable": true,
+		"duration_hours": 24,
+		"coin_multiplier": 2.0,
+		"energy_multiplier": 2.0,
+		"price": "€0.99",
+		"price_value": 0.99,
 		"best_value": true
 	},
 }
@@ -170,10 +99,9 @@ var products: Dictionary = {
 # Track purchased one-time items (persisted)
 var purchased_one_time: Array = []
 
-# VIP status (persisted)
-var vip_expiry: int = 0  # Unix timestamp
-var vip_coin_multiplier: float = 1.0
-var vip_regen_multiplier: float = 1.0
+# Active boosts (persisted) - expiry timestamps
+var coin_boost_expiry: int = 0  # Unix timestamp when x2 coins expires
+var energy_boost_expiry: int = 0  # Unix timestamp when x2 energy regen expires
 
 # Pending purchases (for recovery)
 var pending_purchases: Dictionary = {}
@@ -566,75 +494,73 @@ func _grant_product_rewards(product_id: String, product: Dictionary) -> void:
 	print("[IAP] Granting rewards for: %s" % product_id)
 
 	match product.type:
-		ProductType.COINS:
-			GameManager.coins += product.amount
-			print("[IAP] Added %d coins" % product.amount)
-
-		ProductType.ENERGY:
-			if product.amount == -1:
-				# Full recharge + 10 extra
-				GameManager.energy = GameManager.max_energy + 10
-			else:
-				GameManager.energy = min(GameManager.energy + product.amount, GameManager.max_energy + product.amount)
-			print("[IAP] Added energy")
-
-		ProductType.STARTER_PACK:
-			GameManager.coins += product.coins
-			GameManager.energy = min(GameManager.energy + product.energy, GameManager.max_energy + product.energy)
-			# Activate coin boost
-			if DailyRewardManager:
-				DailyRewardManager.activate_coin_bonus(product.coin_boost_minutes * 60)
-			print("[IAP] Starter pack applied")
-
-		ProductType.VIP:
-			_activate_vip(product.duration_days, product.coin_multiplier, product.regen_reduction)
-			print("[IAP] VIP activated for %d days" % product.duration_days)
-
-		ProductType.NO_ADS:
-			# Remove all ads
-			if AdsManager:
-				AdsManager.remove_ads()
-			print("[IAP] Ads removed permanently")
+		ProductType.BOOST:
+			_activate_boost(product)
+			print("[IAP] Boost activated for %d hours" % product.duration_hours)
 
 	# Save game state
 	if SaveManager:
 		SaveManager.save_game()
 
-# ============= VIP MANAGEMENT =============
+# ============= BOOST MANAGEMENT =============
 
-func _activate_vip(days: int, coin_mult: float, regen_mult: float) -> void:
-	var current_time = Time.get_unix_time_from_system()
-	# Extend VIP if already active, otherwise start fresh
-	if vip_expiry > current_time:
-		vip_expiry += days * 24 * 60 * 60
-	else:
-		vip_expiry = int(current_time) + days * 24 * 60 * 60
+func _activate_boost(product: Dictionary) -> void:
+	var current_time = int(Time.get_unix_time_from_system())
+	var duration_seconds = product.duration_hours * 60 * 60
 
-	vip_coin_multiplier = coin_mult
-	vip_regen_multiplier = regen_mult
+	# Activate coin boost if this product has it
+	if product.coin_multiplier > 1.0:
+		# Extend if already active, otherwise start fresh
+		if coin_boost_expiry > current_time:
+			coin_boost_expiry += duration_seconds
+		else:
+			coin_boost_expiry = current_time + duration_seconds
 
-func is_vip_active() -> bool:
-	return Time.get_unix_time_from_system() < vip_expiry
+	# Activate energy boost if this product has it
+	if product.energy_multiplier > 1.0:
+		# Extend if already active, otherwise start fresh
+		if energy_boost_expiry > current_time:
+			energy_boost_expiry += duration_seconds
+		else:
+			energy_boost_expiry = current_time + duration_seconds
 
-func get_vip_coin_multiplier() -> float:
-	if is_vip_active():
-		return vip_coin_multiplier
+func is_coin_boost_active() -> bool:
+	return Time.get_unix_time_from_system() < coin_boost_expiry
+
+func is_energy_boost_active() -> bool:
+	return Time.get_unix_time_from_system() < energy_boost_expiry
+
+func get_coin_multiplier() -> float:
+	"""Returns 2.0 if coin boost is active, otherwise 1.0"""
+	if is_coin_boost_active():
+		return 2.0
 	return 1.0
 
-func get_vip_regen_multiplier() -> float:
-	if is_vip_active():
-		return vip_regen_multiplier
+func get_energy_regen_multiplier() -> float:
+	"""Returns 2.0 if energy boost is active (faster regen), otherwise 1.0"""
+	if is_energy_boost_active():
+		return 2.0
 	return 1.0
 
-func get_vip_remaining_time() -> String:
-	if not is_vip_active():
+func get_coin_boost_remaining() -> String:
+	"""Returns formatted remaining time for coin boost"""
+	if not is_coin_boost_active():
 		return ""
-	var remaining = vip_expiry - int(Time.get_unix_time_from_system())
-	var days = remaining / (24 * 60 * 60)
-	var hours = (remaining % (24 * 60 * 60)) / (60 * 60)
-	if days > 0:
-		return "%dd %dh" % [days, hours]
-	return "%dh" % hours
+	return _format_remaining_time(coin_boost_expiry)
+
+func get_energy_boost_remaining() -> String:
+	"""Returns formatted remaining time for energy boost"""
+	if not is_energy_boost_active():
+		return ""
+	return _format_remaining_time(energy_boost_expiry)
+
+func _format_remaining_time(expiry: int) -> String:
+	var remaining = expiry - int(Time.get_unix_time_from_system())
+	var hours = remaining / (60 * 60)
+	var minutes = (remaining % (60 * 60)) / 60
+	if hours > 0:
+		return "%dh %dm" % [hours, minutes]
+	return "%dm" % minutes
 
 # ============= PUBLIC API =============
 
@@ -679,17 +605,14 @@ func restore_purchases() -> void:
 func serialize() -> Dictionary:
 	return {
 		"purchased_one_time": purchased_one_time,
-		"vip_expiry": vip_expiry,
-		"vip_coin_multiplier": vip_coin_multiplier,
-		"vip_regen_multiplier": vip_regen_multiplier
+		"coin_boost_expiry": coin_boost_expiry,
+		"energy_boost_expiry": energy_boost_expiry
 	}
 
 func deserialize(data: Dictionary) -> void:
 	if data.has("purchased_one_time"):
 		purchased_one_time = data.purchased_one_time
-	if data.has("vip_expiry"):
-		vip_expiry = data.vip_expiry
-	if data.has("vip_coin_multiplier"):
-		vip_coin_multiplier = data.vip_coin_multiplier
-	if data.has("vip_regen_multiplier"):
-		vip_regen_multiplier = data.vip_regen_multiplier
+	if data.has("coin_boost_expiry"):
+		coin_boost_expiry = data.coin_boost_expiry
+	if data.has("energy_boost_expiry"):
+		energy_boost_expiry = data.energy_boost_expiry
